@@ -1,5 +1,5 @@
 import L from "leaflet";
-import { ChartLayer, deleteChart, importChartFile, listCharts, type ChartMeta } from "../lib/charts";
+import { ChartLayer, deleteChart, ensureBuiltinCharts, importChartFile, listCharts, type ChartMeta } from "../lib/charts";
 import { onFix, lastFix, type Fix } from "../lib/gps";
 import { angleDiff, bearingDeg, compass, destination, distanceNm, formatLat, formatLon } from "../lib/geo";
 import { navCondition, navDay, NAV_LEVELS } from "../lib/navcond";
@@ -41,6 +41,7 @@ export function navView(root: HTMLElement): () => void {
       <button class="fab" id="center" title="Centralizar no barco">◎</button>
     </div>
     <div class="posline" id="pos"></div>
+    <div class="prep" id="prep" hidden></div>
     <div class="sheet" id="sheet"></div>
     <nav class="bottombar">
       <button data-p="trilha"><i>●</i>Trilha</button>
@@ -79,12 +80,20 @@ export function navView(root: HTMLElement): () => void {
   (async () => {
     [waypoints, tracks, charts] = await Promise.all([loadWaypoints(), loadTracks(), listCharts()]);
     chartLayer.setCharts(charts);
-    if (charts.length && !fix) {
-      const b = L.latLngBounds(charts.map((c) => c.bounds).flat() as L.LatLngTuple[]);
-      map.fitBounds(b);
-    }
     drawWaypoints();
     renderAll();
+    // Cartas que vêm com o app: na primeira vez (ou quando houver versão nova) são preparadas aqui.
+    const prep = $("#prep");
+    const n = await ensureBuiltinCharts((m, f) => {
+      prep.hidden = false;
+      prep.textContent = `Preparando cartas incluídas… ${Math.round(f * 100)}%`;
+    }).catch(() => 0);
+    prep.hidden = true;
+    if (n) {
+      charts = await listCharts();
+      chartLayer.setCharts(charts);
+      if (panel === "cartas") renderSheet();
+    }
   })();
 
   const windNow = (): { dir: number; kn: number; src: string } | null => {
@@ -215,12 +224,12 @@ export function navView(root: HTMLElement): () => void {
       }
     } else if (panel === "cartas") {
       body = `<h3>Cartas náuticas oficiais</h3>
-        <p class="small">As cartas raster da Marinha (CHM) são gratuitas. Baixe a versão <b>BSB (.zip)</b> de cada carta da Baía de Todos os Santos (série 1100) e importe aqui. Ficam salvas no aparelho e funcionam sem internet.</p>
+        <p class="small">O app já vem com cartas incluídas. Pra adicionar outras, baixe no site da Marinha (CHM) a versão <b>BSB (.zip)</b> de cada carta da Baía de Todos os Santos (série 1100) e importe aqui. Ficam salvas no aparelho e funcionam sem internet.</p>
         <a class="btn" href="https://www.marinha.mil.br/chm/dados-do-segnav/cartas-raster" target="_blank" rel="noopener">1. Abrir site de cartas do CHM</a>
         <label class="btn primary">2. Importar arquivos .zip / .kap<input type="file" id="chartFile" multiple hidden></label>
         <div id="importMsg" class="muted small">${importStatus}</div>
-        <div class="list">${charts.map((c) => `<div class="item"><div><b>${esc(c.number)} ${esc(c.name)}</b><br><span class="muted small">1:${c.scale.toLocaleString("pt-BR")}${c.update ? ` · atualizada até Aviso ${esc(c.update)}` : c.edition ? ` · edição ${esc(c.edition)}` : ""} · importada ${new Date(c.importedAt).toLocaleDateString("pt-BR")}</span></div>
-          <div class="acts"><button data-zoom="${c.id}">ver</button><button data-delc="${c.id}">✕</button></div></div>`).join("") || `<p class="muted">Nenhuma carta importada ainda.</p>`}</div>
+        <div class="list">${charts.map((c) => `<div class="item"><div><b>${esc(c.number)} ${esc(c.name)}</b><br><span class="muted small">1:${c.scale.toLocaleString("pt-BR")}${c.update ? ` · atualizada até Aviso ${esc(c.update)}` : c.edition ? ` · edição ${esc(c.edition)}` : ""} · ${c.builtin ? "incluída no app" : `importada ${new Date(c.importedAt).toLocaleDateString("pt-BR")}`}</span></div>
+          <div class="acts"><button data-zoom="${c.id}">ver</button>${c.builtin ? "" : `<button data-delc="${c.id}">✕</button>`}</div></div>`).join("") || `<p class="muted">Nenhuma carta importada ainda.</p>`}</div>
         <label class="toggle"><input type="checkbox" id="baseTgl" ${showBase ? "checked" : ""}> Mostrar mapa OpenStreetMap/OpenSeaMap por baixo (precisa de internet)</label>
         <p class="muted small">Confira periodicamente os Avisos aos Navegantes no site do CHM e reimporte a carta quando sair edição nova.</p>`;
     }

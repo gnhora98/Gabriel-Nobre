@@ -23,7 +23,9 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,svg,png,json}"],
+        // inclui as cartas que vêm com o app (KAP) pra funcionarem offline na versão web
+        globPatterns: ["**/*.{js,css,html,svg,png,json,KAP,kap}"],
+        maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
         navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
           {

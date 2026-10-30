@@ -22,6 +22,7 @@ export type ChartMeta = {
   bounds: [[number, number], [number, number]]; // [[S,W],[N,E]]
   levels: { factor: number; cols: number; rows: number; w: number; h: number }[];
   file: string;
+  builtin?: string; // versão da carta incluída no app (ausente = importada pelo usuário)
 };
 
 const metaStore = createStore("cartas-meta", "meta");
@@ -98,7 +99,38 @@ export async function importChartFile(file: File, progress: ImportProgress = () 
   return out;
 }
 
-async function importKap(fileName: string, data: Uint8Array, progress: ImportProgress): Promise<ChartMeta> {
+// ---------- Cartas incluídas no app ----------
+
+const BUILTIN_BASE = `${import.meta.env.BASE_URL}charts/`;
+let builtinRun: Promise<number> | null = null;
+
+/**
+ * Prepara as cartas que vêm junto com o app (public/charts). Só reprocessa quando a versão
+ * listada em index.json muda. Retorna quantas cartas foram (re)importadas.
+ */
+export function ensureBuiltinCharts(progress: ImportProgress = () => {}): Promise<number> {
+  builtinRun ??= (async () => {
+    const r = await fetch(`${BUILTIN_BASE}index.json`, { cache: "no-cache" });
+    if (!r.ok) return 0;
+    const idx = (await r.json()) as { cartas: { file: string; version: string }[] };
+    let n = 0;
+    for (const c of idx.cartas) {
+      const id = c.file.replace(/\.kap$/i, "").toUpperCase();
+      const m = await get<ChartMeta>(id, metaStore);
+      // já está na versão atual, ou o usuário importou a própria versão (que pode ser mais nova)
+      if (m && (m.builtin === c.version || !m.builtin)) continue;
+      const f = await fetch(BUILTIN_BASE + c.file);
+      if (!f.ok) continue;
+      await importKap(c.file, new Uint8Array(await f.arrayBuffer()), (msg, fr) => progress(`${c.file}: ${msg}`, fr), c.version);
+      n++;
+    }
+    bitmapCache.clear();
+    return n;
+  })().finally(() => (builtinRun = null));
+  return builtinRun;
+}
+
+async function importKap(fileName: string, data: Uint8Array, progress: ImportProgress, builtin?: string): Promise<ChartMeta> {
   const h = parseKapHeader(data);
   const g = fitGeoref(h);
   const id = fileName.replace(/\.kap$/i, "").toUpperCase();
@@ -185,6 +217,7 @@ async function importKap(fileName: string, data: Uint8Array, progress: ImportPro
     bounds: [[Math.min(a.lat, b.lat), Math.min(a.lon, b.lon)], [Math.max(a.lat, b.lat), Math.max(a.lon, b.lon)]],
     levels: levels.map(({ factor, cols, rows, w, h: hh }) => ({ factor, cols, rows, w, h: hh })),
     file: fileName,
+    builtin,
   };
   await set(id, meta, metaStore);
   progress("pronto", 1);

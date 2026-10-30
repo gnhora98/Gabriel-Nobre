@@ -2,8 +2,9 @@ import { BEACHES } from "../data/beaches";
 import { beachDays, explain, rankBeaches, LEVELS } from "../lib/surf";
 import { hourIndex, wx } from "../lib/forecast";
 import { compass } from "../lib/geo";
-import { DAY, dayStart, fmtTime, fmtWeekday, localHour, num, cap, fmtDate } from "../lib/util";
+import { DAY, esc, dayStart, fmtTime, fmtWeekday, localHour, num, cap, fmtDate } from "../lib/util";
 import { state, onData } from "../state";
+import { addUserCam, camsFor, normalizeUrl, removeUserCam } from "../lib/cams";
 import { dayChips, statusLine, surfThermometer, tidePanel } from "../ui/components";
 
 let selectedDay = 0;
@@ -32,7 +33,7 @@ export function surfListView(root: HTMLElement): () => void {
         .map(({ beach, day }) => {
           const h = day.best;
           return `<a class="beach" href="#/surf/${beach.id}">
-            <div><div class="n">${beach.name}${beach.city !== "Salvador" ? ` <small>(Lauro)</small>` : ""}${beach.cams?.length ? ` <span class="camtag">📹 ao vivo</span>` : ""}</div>
+            <div><div class="n">${beach.name}${beach.city !== "Salvador" ? ` <small>(Lauro)</small>` : ""}${camsFor(beach).length ? ` <span class="camtag">📹 ao vivo</span>` : ""}</div>
             <div class="d">${num(h.breakHeight)} m · ${Math.round(h.period)} s · ${compass(h.swellDir)} · ${h.windKind} · ${fmtTime(day.window[0])}–${fmtTime(day.window[1])}</div></div>
             ${tag(h.level)}</a>`;
         })
@@ -49,15 +50,35 @@ export function surfListView(root: HTMLElement): () => void {
 
 export function surfDetailView(root: HTMLElement, id: string): () => void {
   const beach = BEACHES.find((x) => x.id === id);
+  if (!beach) {
+    root.innerHTML = `<div class="page"><a href="#/surf">‹ Praias</a><p>Praia não encontrada.</p></div>`;
+    return () => {};
+  }
+  // Câmeras não dependem da previsão: aparecem mesmo sem dados salvos.
+  const camsBlock = () => `<div class="cams">${camsFor(beach).map((c) => `<div class="camrow"><a class="cam" href="${esc(c.url)}" target="_blank" rel="noopener"><b>📹 ${esc(c.name)}</b><span>ao vivo · ${esc(c.provider)} · abre no navegador ↗</span></a>${c.user ? `<button class="camdel" data-url="${esc(c.url)}" title="Remover">✕</button>` : ""}</div>`).join("")}
+        <button class="camadd" id="camAdd">+ Adicionar câmera desta praia</button></div>`;
+  const bindCams = () => {
+    root.querySelector("#camAdd")?.addEventListener("click", () => {
+      const raw = prompt(`Cole o link da câmera ao vivo de ${beach.name}`);
+      if (!raw) return;
+      const url = normalizeUrl(raw);
+      if (!url) { alert("Link inválido."); return; }
+      const name = prompt("Nome da câmera", "Câmera") || "Câmera";
+      addUserCam(beach.id, { name: name.slice(0, 40), url, provider: new URL(url).hostname.replace(/^www\./, "") });
+      render();
+    });
+    root.querySelectorAll<HTMLButtonElement>(".camdel").forEach((btn) =>
+      btn.addEventListener("click", () => { if (confirm("Remover esta câmera?")) { removeUserCam(beach.id, btn.dataset.url!); render(); } }),
+    );
+  };
   const render = () => {
     const b = state.bundle;
-    if (!beach) { root.innerHTML = `<div class="page"><a href="#/surf">‹ Praias</a><p>Praia não encontrada.</p></div>`; return; }
-    if (!b) { root.innerHTML = `<div class="page"><a href="#/surf" class="back">‹ Praias</a><h1>${beach.name}</h1><div class="status">${statusLine()}</div></div>`; return; }
+    if (!b) { root.innerHTML = `<div class="page"><a href="#/surf" class="back">‹ Praias</a><h1>${beach.name}</h1>${camsBlock()}<div class="status">${statusLine()}</div></div>`; bindCams(); return; }
     const days = days7();
     if (!selectedDay || !days.includes(selectedDay)) selectedDay = days[0];
     const all = beachDays(beach, b, days[0], 7);
     const d = all.find((x) => x.day === selectedDay) ?? all[0];
-    if (!d) { root.innerHTML = `<div class="page"><a href="#/surf" class="back">‹ Praias</a><p>Sem dados pra esse dia.</p></div>`; return; }
+    if (!d) { root.innerHTML = `<div class="page"><a href="#/surf" class="back">‹ Praias</a><h1>${beach.name}</h1>${camsBlock()}<p>Sem dados pra esse dia.</p></div>`; bindCams(); return; }
     const h = d.best;
     const w = b.weather;
     // clima do dia
@@ -78,7 +99,7 @@ export function surfDetailView(root: HTMLElement, id: string): () => void {
       <a href="#/surf" class="back">‹ Praias</a>
       <h1>${beach.name}</h1>
       <div class="muted small">${beach.city} · fundo de ${beach.bottom} · ${beach.notes}</div>
-      ${beach.cams?.length ? `<div class="cams">${beach.cams.map((c) => `<a class="cam" href="${c.url}" target="_blank" rel="noopener"><b>📹 ${c.name}</b><span>ao vivo · ${c.provider} · abre no navegador ↗</span></a>`).join("")}</div>` : ""}
+      ${camsBlock()}
       ${surfThermometer(h.level, h.score)}
       ${dayChips(days, d.day, (dd) => { const x = all.find((a) => a.day === dd); return x ? LEVELS[x.best.level].color : undefined; })}
       <div class="grid">
@@ -103,6 +124,7 @@ export function surfDetailView(root: HTMLElement, id: string): () => void {
     root.querySelectorAll<HTMLButtonElement>(".day").forEach((btn) =>
       btn.addEventListener("click", () => { selectedDay = Number(btn.dataset.day); render(); }),
     );
+    bindCams();
   };
   render();
   return onData(render);

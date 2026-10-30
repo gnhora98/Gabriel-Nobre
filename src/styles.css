@@ -179,3 +179,8 @@ h3 { font-size: 18px; margin-bottom: 10px; }
 .cam { display: flex; flex-direction: column; background: linear-gradient(135deg, #3a1020, #5a1830); border: 1px solid #7a2540; border-radius: 12px; padding: 10px 12px; }
 .cam b { font-size: 14px; }
 .cam span { font-size: 11px; color: #f0b0c0; margin-top: 2px; }
+.prep { position: absolute; top: calc(140px + var(--safe-t)); left: 50%; transform: translateX(-50%); background: rgba(10, 22, 36, 0.92); color: #cfe0ef; font-size: 12px; padding: 7px 12px; border-radius: 12px; z-index: 600; white-space: nowrap; }
+.camrow { display: flex; gap: 6px; align-items: stretch; }
+.camrow .cam { flex: 1; }
+.camdel { background: #24384d; border-radius: 12px; padding: 0 12px; font-size: 13px; }
+.camadd { border: 1px dashed #3a5068; border-radius: 12px; padding: 9px; font-size: 13px; color: #9fb6cc; }
