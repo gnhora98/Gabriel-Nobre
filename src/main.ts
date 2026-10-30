@@ -32,6 +32,11 @@ function route() {
   window.scrollTo(0, 0);
 }
 
+// O Netlify injeta um selo fixo no canto inferior; abre espaço pra ele não cobrir os botões.
+const badgeCheck = () => document.body.classList.toggle("has-host-badge", !!document.getElementById("nl-badge-frame"));
+new MutationObserver(badgeCheck).observe(document.body, { childList: true });
+badgeCheck();
+
 window.addEventListener("hashchange", route);
 initData();
 route();

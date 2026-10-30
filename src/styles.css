@@ -148,10 +148,10 @@ h3 { font-size: 18px; margin-bottom: 10px; }
 .fab { width: 46px; height: 46px; border-radius: 50%; background: rgba(10, 22, 36, 0.9); color: #fff; font-size: 19px; }
 .posline { position: absolute; left: 10px; right: 64px; bottom: calc(84px + var(--safe-b)); background: rgba(10, 22, 36, 0.88); padding: 6px 10px; border-radius: 10px; font-size: 11px; color: #cfe0ef; z-index: 600; font-family: ui-monospace, Menlo, monospace; line-height: 1.5; width: fit-content; max-width: calc(100% - 74px); }
 .rec { color: #ff6b8a; }
-.bottombar { position: absolute; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-around; background: rgba(10, 22, 36, 0.97); padding: 8px 0 calc(8px + var(--safe-b)); z-index: 700; }
+.bottombar { position: absolute; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-around; background: #0a1624; padding: 8px 0 calc(8px + var(--safe-b)); z-index: 1101; }
 .leaflet-bottom.leaflet-right { bottom: calc(76px + var(--safe-b)); }
 .leaflet-bottom .leaflet-control-attribution { font-size: 9px; background: rgba(255, 255, 255, 0.6); }
-.sheet { position: absolute; left: 0; right: 0; bottom: calc(64px + var(--safe-b)); max-height: 68vh; overflow-y: auto; background: var(--bg); border-radius: 18px 18px 0 0; padding: 6px 16px 16px; z-index: 650; transform: translateY(110%); transition: transform 0.25s; box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4); }
+.sheet { position: absolute; left: 0; right: 0; bottom: calc(64px + var(--safe-b)); max-height: 68vh; overflow-y: auto; background: var(--bg); border-radius: 18px 18px 0 0; padding: 6px 16px 16px; z-index: 1100; transform: translateY(110%); transition: transform 0.25s; box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4); }
 .sheet.open { transform: none; }
 .grab { width: 44px; height: 5px; border-radius: 3px; background: #3a5068; margin: 6px auto 12px; cursor: pointer; }
 .btn { display: block; text-align: center; background: #24384d; border-radius: 12px; padding: 11px; margin-bottom: 10px; font-weight: 600; font-size: 14px; }
@@ -168,3 +168,7 @@ h3 { font-size: 18px; margin-bottom: 10px; }
 .wpt .pin { width: 14px; height: 14px; border-radius: 50% 50% 50% 0; background: #ff8a00; transform: rotate(-45deg); border: 2px solid #fff; }
 .wpt .pin.act { background: #ff2f7a; }
 .wpt span { position: absolute; left: 18px; top: -2px; font-size: 11px; font-weight: 700; color: #111; white-space: nowrap; text-shadow: 0 0 3px #fff, 0 0 3px #fff; }
+
+/* espaço pro selo do provedor de hospedagem */
+.has-host-badge { --safe-b: calc(env(safe-area-inset-bottom, 0px) + 66px); }
+.has-host-badge .tabbar, .has-host-badge .bottombar { box-shadow: 0 66px 0 0 #0a1624; }
