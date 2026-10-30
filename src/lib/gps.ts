@@ -1,6 +1,7 @@
 // GPS: posição, velocidade (SOG) e rumo (COG) com suavização; mantém a tela ligada.
 import { Capacitor, registerPlugin } from "@capacitor/core";
 import { bearingDeg, distanceNm, KN_PER_MS } from "./geo";
+import { t } from "../i18n";
 
 // No app Android, GPS em segundo plano (continua com a tela apagada) e tela sempre ligada.
 type BgLocation = { latitude: number; longitude: number; accuracy: number; speed: number | null; bearing: number | null; time: number | null };
@@ -15,6 +16,7 @@ const KeepAwake = native ? registerPlugin<{ keepAwake(): Promise<void>; allowSle
 let nativeWatcher: string | null = null;
 
 export type Fix = { lat: number; lon: number; acc: number; sog: number; cog: number | null; time: number };
+// err é uma chave de tradução (i18n.ts)
 type Listener = (f: Fix | null, err?: string) => void;
 
 let watchId: number | null = null;
@@ -41,16 +43,16 @@ function emit(f: Fix | null, err?: string) {
 
 function start() {
   if (watchId != null || !("geolocation" in navigator)) {
-    if (!("geolocation" in navigator)) emit(null, "Este aparelho não tem GPS disponível no navegador.");
+    if (!("geolocation" in navigator)) emit(null, "gps.none");
     return;
   }
   if (BackgroundGeolocation) {
     watchId = -1;
     BackgroundGeolocation.addWatcher(
-      { backgroundTitle: "Carta BTS", backgroundMessage: "Gravando posição e trilha", requestPermissions: true, stale: false, distanceFilter: 0 },
+      { backgroundTitle: "Carta BTS", backgroundMessage: t("gps.bg"), requestPermissions: true, stale: false, distanceFilter: 0 },
       (l, e) => {
         if (e) {
-          emit(last, e.code === "NOT_AUTHORIZED" ? "Permita a localização (\"o tempo todo\") nas configurações do app." : "Sem sinal de GPS.");
+          emit(last, e.code === "NOT_AUTHORIZED" ? "gps.nativeDenied" : "gps.noSignal");
           return;
         }
         if (l) handle(l.latitude, l.longitude, l.accuracy, l.speed, l.bearing, l.time ?? Date.now());
@@ -64,7 +66,7 @@ function start() {
       const { latitude: lat, longitude: lon, accuracy: acc, speed, heading } = p.coords;
       handle(lat, lon, acc, speed, heading, p.timestamp);
     },
-    (e) => emit(last, e.code === 1 ? "Permita o acesso à localização pra usar o GPS." : "Sem sinal de GPS."),
+    (e) => emit(last, e.code === 1 ? "gps.denied" : "gps.noSignal"),
     { enableHighAccuracy: true, maximumAge: 1000, timeout: 30000 },
   );
   keepAwake();

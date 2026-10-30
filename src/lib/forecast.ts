@@ -7,6 +7,7 @@
 import { Capacitor } from "@capacitor/core";
 import { get, set } from "idb-keyval";
 import { MARINE_POINTS, CITY_POINT } from "../data/beaches";
+import { t } from "../i18n";
 
 const TZ = "America%2FBahia";
 
@@ -217,12 +218,12 @@ export function hourIndex(times: number[], ms: number): number {
   return best;
 }
 
-export const WEATHER_CODES: Record<number, [string, string]> = {
-  0: ["☀️", "Céu limpo"], 1: ["🌤️", "Poucas nuvens"], 2: ["⛅", "Sol entre nuvens"], 3: ["☁️", "Nublado"],
-  45: ["🌫️", "Nevoeiro"], 48: ["🌫️", "Nevoeiro"],
-  51: ["🌦️", "Garoa fraca"], 53: ["🌦️", "Garoa"], 55: ["🌧️", "Garoa forte"],
-  61: ["🌦️", "Chuva fraca"], 63: ["🌧️", "Chuva"], 65: ["🌧️", "Chuva forte"],
-  80: ["🌦️", "Pancadas fracas"], 81: ["🌧️", "Pancadas de chuva"], 82: ["⛈️", "Pancadas fortes"],
-  95: ["⛈️", "Trovoada"], 96: ["⛈️", "Trovoada com granizo"], 99: ["⛈️", "Trovoada forte"],
+const WX_ICON: Record<number, string> = {
+  0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️", 45: "🌫️", 48: "🌫️", 51: "🌦️", 53: "🌦️", 55: "🌧️",
+  61: "🌦️", 63: "🌧️", 65: "🌧️", 80: "🌦️", 81: "🌧️", 82: "⛈️", 95: "⛈️", 96: "⛈️", 99: "⛈️",
 };
-export const wx = (code: number) => WEATHER_CODES[code] ?? ["⛅", "—"];
+/** [ícone, descrição no idioma atual] do código de tempo WMO. */
+export const wx = (code: number): [string, string] => {
+  const c = code === 48 ? 45 : code;
+  return WX_ICON[code] ? [WX_ICON[code], t(`wc.${c}`)] : ["⛅", "—"];
+};

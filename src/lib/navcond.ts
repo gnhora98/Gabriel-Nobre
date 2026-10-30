@@ -1,14 +1,20 @@
 // Termômetro de navegação: resume vento, rajada, ondas e tempo na BTS em uma palavra.
 import type { Bundle } from "./forecast";
 import { hourIndex } from "./forecast";
+import { t } from "../i18n";
 
 export type NavLevel = 0 | 1 | 2 | 3 | 4;
-export const NAV_LEVELS: Record<NavLevel, { word: string; color: string; hint: string }> = {
-  0: { word: "CALMARIA", color: "#8aa0b6", hint: "Sem vento e mar liso. Veleiro vai sofrer." },
-  1: { word: "TRANQUILO", color: "#21d07a", hint: "Boas condições pra navegar." },
-  2: { word: "MODERADO", color: "#3fb6ff", hint: "Mar com alguma onda/vento. Atenção na boca da baía." },
-  3: { word: "AGITADO", color: "#ffb020", hint: "Vento forte e mar mexido. Só com experiência." },
-  4: { word: "PERIGOSO", color: "#ff3b5c", hint: "Evite sair. Rajadas fortes, mar grosso ou trovoada." },
+const nv = (n: NavLevel, color: string) => ({
+  get word() { return t(`nv.${n}`); },
+  get hint() { return t(`nvh.${n}`); },
+  color,
+});
+export const NAV_LEVELS: Record<NavLevel, { readonly word: string; readonly hint: string; color: string }> = {
+  0: nv(0, "#8aa0b6"),
+  1: nv(1, "#21d07a"),
+  2: nv(2, "#3fb6ff"),
+  3: nv(3, "#ffb020"),
+  4: nv(4, "#ff3b5c"),
 };
 
 export type NavCond = { level: NavLevel; windKn: number; gustKn: number; windDir: number; wave: number; code: number; time: number };

@@ -1,6 +1,7 @@
 // Importa cartas raster do CHM (.zip ou .kap), corta em blocos com níveis de resolução
 // e guarda tudo no aparelho (IndexedDB). Uma GridLayer do Leaflet desenha os blocos sob demanda.
 import L from "leaflet";
+import { t } from "../i18n";
 import { unzipSync } from "fflate";
 import { createStore, get, set, del, keys } from "idb-keyval";
 import { blankMask, fitGeoref, kapRows, latLonToPx, parseKapHeader, pxToLatLon, toMercX, toMercY, type Georef, type KapHeader } from "./kap";
@@ -108,7 +109,7 @@ export async function importChartFile(file: File, progress: ImportProgress = () 
   if (file.name.toLowerCase().endsWith(".zip") || (buf[0] === 0x50 && buf[1] === 0x4b)) {
     const files = unzipSync(buf, { filter: (f) => /\.kap$/i.test(f.name) });
     for (const [name, data] of Object.entries(files)) kaps.push({ name: name.split("/").pop()!, data });
-    if (!kaps.length) throw new Error("O .zip não tem arquivo .KAP. Baixe a versão BSB (não a GeoTIFF).");
+    if (!kaps.length) throw new Error(t("charts.noKap"));
   } else {
     kaps.push({ name: file.name, data: buf });
   }
