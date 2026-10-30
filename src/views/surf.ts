@@ -32,7 +32,7 @@ export function surfListView(root: HTMLElement): () => void {
         .map(({ beach, day }) => {
           const h = day.best;
           return `<a class="beach" href="#/surf/${beach.id}">
-            <div><div class="n">${beach.name}${beach.city !== "Salvador" ? ` <small>(Lauro)</small>` : ""}</div>
+            <div><div class="n">${beach.name}${beach.city !== "Salvador" ? ` <small>(Lauro)</small>` : ""}${beach.cams?.length ? ` <span class="camtag">📹 ao vivo</span>` : ""}</div>
             <div class="d">${num(h.breakHeight)} m · ${Math.round(h.period)} s · ${compass(h.swellDir)} · ${h.windKind} · ${fmtTime(day.window[0])}–${fmtTime(day.window[1])}</div></div>
             ${tag(h.level)}</a>`;
         })
@@ -78,6 +78,7 @@ export function surfDetailView(root: HTMLElement, id: string): () => void {
       <a href="#/surf" class="back">‹ Praias</a>
       <h1>${beach.name}</h1>
       <div class="muted small">${beach.city} · fundo de ${beach.bottom} · ${beach.notes}</div>
+      ${beach.cams?.length ? `<div class="cams">${beach.cams.map((c) => `<a class="cam" href="${c.url}" target="_blank" rel="noopener"><b>📹 ${c.name}</b><span>ao vivo · ${c.provider} · abre no navegador ↗</span></a>`).join("")}</div>` : ""}
       ${surfThermometer(h.level, h.score)}
       ${dayChips(days, d.day, (dd) => { const x = all.find((a) => a.day === dd); return x ? LEVELS[x.best.level].color : undefined; })}
       <div class="grid">

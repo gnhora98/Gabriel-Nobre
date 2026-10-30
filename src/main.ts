@@ -1,5 +1,6 @@
 import "leaflet/dist/leaflet.css";
 import "./styles.css";
+import { Capacitor } from "@capacitor/core";
 import { registerSW } from "virtual:pwa-register";
 import { initData } from "./state";
 import { homeView } from "./views/home";
@@ -40,4 +41,5 @@ badgeCheck();
 window.addEventListener("hashchange", route);
 initData();
 route();
-registerSW({ immediate: true });
+// No app Android os arquivos já vêm dentro do APK; o service worker só serve pra versão web.
+if (!Capacitor.isNativePlatform()) registerSW({ immediate: true });

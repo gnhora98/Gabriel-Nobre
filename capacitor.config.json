@@ -1,0 +1,8 @@
+{
+  "appId": "br.carta.bts",
+  "appName": "Carta BTS",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": false
+  }
+}

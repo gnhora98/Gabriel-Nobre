@@ -172,3 +172,10 @@ h3 { font-size: 18px; margin-bottom: 10px; }
 /* espaço pro selo do provedor de hospedagem */
 .has-host-badge { --safe-b: calc(env(safe-area-inset-bottom, 0px) + 66px); }
 .has-host-badge .tabbar, .has-host-badge .bottombar { box-shadow: 0 66px 0 0 #0a1624; }
+
+/* câmeras ao vivo */
+.camtag { font-size: 10px; font-weight: 700; color: #ff6b8a; margin-left: 4px; white-space: nowrap; }
+.cams { display: flex; flex-direction: column; gap: 6px; margin: 10px 0 4px; }
+.cam { display: flex; flex-direction: column; background: linear-gradient(135deg, #3a1020, #5a1830); border: 1px solid #7a2540; border-radius: 12px; padding: 10px 12px; }
+.cam b { font-size: 14px; }
+.cam span { font-size: 11px; color: #f0b0c0; margin-top: 2px; }

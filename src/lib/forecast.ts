@@ -4,6 +4,7 @@
 //  - Ondas/swell: Open-Meteo Marine (MeteoFrance MFWAM / ECMWF WAM)
 //  - Vento observado: METAR SBSV (Aeroporto de Salvador) via função Netlify /api/metar
 //  - Nível do mar observado: marégrafo EMSAL Salvador (IOC Sea Level Monitoring)
+import { Capacitor } from "@capacitor/core";
 import { get, set } from "idb-keyval";
 import { MARINE_POINTS, CITY_POINT } from "../data/beaches";
 
@@ -130,7 +131,8 @@ async function fetchMarine(lat: number, lon: number): Promise<Marine> {
 
 async function fetchMetar(): Promise<Metar | null> {
   try {
-    const d = await getJson("/api/metar", 10000);
+    // No app Android não há servidor local: usa a função publicada no site.
+    const d = await getJson(Capacitor.isNativePlatform() ? "https://carta-bts.netlify.app/api/metar" : "/api/metar", 10000);
     const m = Array.isArray(d) ? d[0] : null;
     if (!m) return null;
     return {
