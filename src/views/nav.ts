@@ -1,5 +1,5 @@
 import L from "leaflet";
-import { ChartLayer, deleteChart, ensureBuiltinCharts, importChartFile, listCharts, type ChartMeta } from "../lib/charts";
+import { ChartLayer, deleteChart, importChartFile, listCharts, type ChartMeta } from "../lib/charts";
 import { onFix, lastFix, type Fix } from "../lib/gps";
 import { angleDiff, bearingDeg, compass, destination, distanceNm, formatLat, formatLon } from "../lib/geo";
 import { navCondition, navDay, NAV_LEVELS } from "../lib/navcond";
@@ -41,7 +41,6 @@ export function navView(root: HTMLElement): () => void {
       <button class="fab" id="center" title="Centralizar no barco">◎</button>
     </div>
     <div class="posline" id="pos"></div>
-    <div class="prep" id="prep" hidden></div>
     <div class="sheet" id="sheet"></div>
     <nav class="bottombar">
       <button data-p="trilha"><i>●</i>Trilha</button>
@@ -82,18 +81,6 @@ export function navView(root: HTMLElement): () => void {
     chartLayer.setCharts(charts);
     drawWaypoints();
     renderAll();
-    // Cartas que vêm com o app: na primeira vez (ou quando houver versão nova) são preparadas aqui.
-    const prep = $("#prep");
-    const n = await ensureBuiltinCharts((m, f) => {
-      prep.hidden = false;
-      prep.textContent = `Preparando cartas incluídas… ${Math.round(f * 100)}%`;
-    }).catch(() => 0);
-    prep.hidden = true;
-    if (n) {
-      charts = await listCharts();
-      chartLayer.setCharts(charts);
-      if (panel === "cartas") renderSheet();
-    }
   })();
 
   const windNow = (): { dir: number; kn: number; src: string } | null => {

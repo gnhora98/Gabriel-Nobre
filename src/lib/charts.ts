@@ -23,19 +23,40 @@ export type ChartMeta = {
   levels: { factor: number; cols: number; rows: number; w: number; h: number }[];
   file: string;
   builtin?: string; // versão da carta incluída no app (ausente = importada pelo usuário)
+  base?: string; // cartas incluídas: pasta dos blocos PNG prontos (gerados por scripts/build-charts.ts)
 };
 
 const metaStore = createStore("cartas-meta", "meta");
 const tileStore = createStore("cartas-tiles", "tiles");
 
+let builtinCatalog: Promise<ChartMeta[]> | null = null;
+
+/** Cartas que já vêm no app (site e APK), prontas em public/charts. */
+function builtinCharts(): Promise<ChartMeta[]> {
+  builtinCatalog ??= fetch(`${import.meta.env.BASE_URL}charts/catalog.json`)
+    .then((r) => (r.ok ? r.json() : { cartas: [] }))
+    .then((d: { cartas: ChartMeta[] }) => d.cartas)
+    .catch(() => {
+      builtinCatalog = null;
+      return [];
+    });
+  return builtinCatalog;
+}
+
+/** Cartas incluídas + importadas pelo usuário (a importada substitui a incluída de mesmo número). */
 export async function listCharts(): Promise<ChartMeta[]> {
   const ks = await keys(metaStore);
-  const out: ChartMeta[] = [];
+  const mine: ChartMeta[] = [];
   for (const k of ks) {
     const m = await get<ChartMeta>(k, metaStore);
-    if (m) out.push(m);
+    if (!m) continue;
+    // cópia antiga de carta incluída (v1.1 processava no aparelho): agora vem pronta, apaga
+    if (m.builtin) void deleteChart(m.id);
+    else mine.push(m);
   }
-  return out.sort((a, b) => b.scale - a.scale);
+  const ids = new Set(mine.map((m) => m.id));
+  const all = [...(await builtinCharts()).filter((m) => !ids.has(m.id)), ...mine];
+  return all.sort((a, b) => b.scale - a.scale);
 }
 
 export async function deleteChart(id: string): Promise<void> {
@@ -99,38 +120,7 @@ export async function importChartFile(file: File, progress: ImportProgress = () 
   return out;
 }
 
-// ---------- Cartas incluídas no app ----------
-
-const BUILTIN_BASE = `${import.meta.env.BASE_URL}charts/`;
-let builtinRun: Promise<number> | null = null;
-
-/**
- * Prepara as cartas que vêm junto com o app (public/charts). Só reprocessa quando a versão
- * listada em index.json muda. Retorna quantas cartas foram (re)importadas.
- */
-export function ensureBuiltinCharts(progress: ImportProgress = () => {}): Promise<number> {
-  builtinRun ??= (async () => {
-    const r = await fetch(`${BUILTIN_BASE}index.json`, { cache: "no-cache" });
-    if (!r.ok) return 0;
-    const idx = (await r.json()) as { cartas: { file: string; version: string }[] };
-    let n = 0;
-    for (const c of idx.cartas) {
-      const id = c.file.replace(/\.kap$/i, "").toUpperCase();
-      const m = await get<ChartMeta>(id, metaStore);
-      // já está na versão atual, ou o usuário importou a própria versão (que pode ser mais nova)
-      if (m && (m.builtin === c.version || !m.builtin)) continue;
-      const f = await fetch(BUILTIN_BASE + c.file);
-      if (!f.ok) continue;
-      await importKap(c.file, new Uint8Array(await f.arrayBuffer()), (msg, fr) => progress(`${c.file}: ${msg}`, fr), c.version);
-      n++;
-    }
-    bitmapCache.clear();
-    return n;
-  })().finally(() => (builtinRun = null));
-  return builtinRun;
-}
-
-async function importKap(fileName: string, data: Uint8Array, progress: ImportProgress, builtin?: string): Promise<ChartMeta> {
+async function importKap(fileName: string, data: Uint8Array, progress: ImportProgress): Promise<ChartMeta> {
   const h = parseKapHeader(data);
   const g = fitGeoref(h);
   const id = fileName.replace(/\.kap$/i, "").toUpperCase();
@@ -217,7 +207,6 @@ async function importKap(fileName: string, data: Uint8Array, progress: ImportPro
     bounds: [[Math.min(a.lat, b.lat), Math.min(a.lon, b.lon)], [Math.max(a.lat, b.lat), Math.max(a.lon, b.lon)]],
     levels: levels.map(({ factor, cols, rows, w, h: hh }) => ({ factor, cols, rows, w, h: hh })),
     file: fileName,
-    builtin,
   };
   await set(id, meta, metaStore);
   progress("pronto", 1);
@@ -231,14 +220,19 @@ const R = 6378137;
 const bitmapCache = new Map<string, Promise<ImageBitmap | null>>();
 const CACHE_MAX = 80;
 
-function loadBitmap(key: string): Promise<ImageBitmap | null> {
+function loadTile(m: ChartMeta, f: number, r: number, c: number): Promise<ImageBitmap | null> {
+  return m.base ? loadBitmap(`${import.meta.env.BASE_URL}${m.base}${f}/${r}-${c}.png`, true) : loadBitmap(`${m.id}/${f}/${r}/${c}`);
+}
+
+function loadBitmap(key: string, url = false): Promise<ImageBitmap | null> {
   let p = bitmapCache.get(key);
   if (p) {
     bitmapCache.delete(key);
     bitmapCache.set(key, p);
     return p;
   }
-  p = get<Blob>(key, tileStore).then((b) => (b ? createImageBitmap(b) : null)).catch(() => null);
+  const blob = url ? fetch(key).then((r) => (r.ok ? r.blob() : undefined)) : get<Blob>(key, tileStore);
+  p = blob.then((b) => (b ? createImageBitmap(b) : null)).catch(() => null);
   bitmapCache.set(key, p);
   if (bitmapCache.size > CACHE_MAX) {
     const first = bitmapCache.keys().next().value as string;
@@ -296,7 +290,7 @@ export class ChartLayer extends L.GridLayer {
       for (let r = r0; r <= r1; r++)
         for (let cc = c0; cc <= c1; cc++) {
           jobs.push(
-            loadBitmap(`${m.id}/${f}/${r}/${cc}`).then((bm) => {
+            loadTile(m, f, r, cc).then((bm) => {
               if (!bm) return;
               const dx = (cc * TILE - lx0) * sx, dy = (r * TILE - ly0) * sy;
               ctx.drawImage(bm, dx, dy, TILE * sx, TILE * sy);

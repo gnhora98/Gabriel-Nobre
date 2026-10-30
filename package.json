@@ -4,9 +4,10 @@
   "description": "",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "npm run charts && tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "charts": "tsx scripts/build-charts.ts"
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
     "@types/leaflet": "^1.9.22",
     "@types/node": "^26.6.6",
     "pngjs": "^7.0.0",
+    "sharp": "^0.35.5",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.5",
