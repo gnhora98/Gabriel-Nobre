@@ -217,9 +217,9 @@ export function navView(root: HTMLElement): () => void {
       body = `<h3>Cartas náuticas oficiais</h3>
         <p class="small">As cartas raster da Marinha (CHM) são gratuitas. Baixe a versão <b>BSB (.zip)</b> de cada carta da Baía de Todos os Santos (série 1100) e importe aqui. Ficam salvas no aparelho e funcionam sem internet.</p>
         <a class="btn" href="https://www.marinha.mil.br/chm/dados-do-segnav/cartas-raster" target="_blank" rel="noopener">1. Abrir site de cartas do CHM</a>
-        <label class="btn primary">2. Importar arquivos .zip / .kap<input type="file" id="chartFile" accept=".zip,.kap,.KAP,application/zip" multiple hidden></label>
+        <label class="btn primary">2. Importar arquivos .zip / .kap<input type="file" id="chartFile" multiple hidden></label>
         <div id="importMsg" class="muted small">${importStatus}</div>
-        <div class="list">${charts.map((c) => `<div class="item"><div><b>${esc(c.number)} ${esc(c.name)}</b><br><span class="muted small">1:${c.scale.toLocaleString("pt-BR")}${c.edition ? ` · edição ${esc(c.edition)}` : ""} · importada ${new Date(c.importedAt).toLocaleDateString("pt-BR")}</span></div>
+        <div class="list">${charts.map((c) => `<div class="item"><div><b>${esc(c.number)} ${esc(c.name)}</b><br><span class="muted small">1:${c.scale.toLocaleString("pt-BR")}${c.update ? ` · atualizada até Aviso ${esc(c.update)}` : c.edition ? ` · edição ${esc(c.edition)}` : ""} · importada ${new Date(c.importedAt).toLocaleDateString("pt-BR")}</span></div>
           <div class="acts"><button data-zoom="${c.id}">ver</button><button data-delc="${c.id}">✕</button></div></div>`).join("") || `<p class="muted">Nenhuma carta importada ainda.</p>`}</div>
         <label class="toggle"><input type="checkbox" id="baseTgl" ${showBase ? "checked" : ""}> Mostrar mapa OpenStreetMap/OpenSeaMap por baixo (precisa de internet)</label>
         <p class="muted small">Confira periodicamente os Avisos aos Navegantes no site do CHM e reimporte a carta quando sair edição nova.</p>`;

@@ -3,7 +3,7 @@
 import L from "leaflet";
 import { unzipSync } from "fflate";
 import { createStore, get, set, del, keys } from "idb-keyval";
-import { fitGeoref, kapRows, latLonToPx, parseKapHeader, pxToLatLon, toMercX, toMercY, type Georef, type KapHeader } from "./kap";
+import { blankMask, fitGeoref, kapRows, latLonToPx, parseKapHeader, pxToLatLon, toMercX, toMercY, type Georef, type KapHeader } from "./kap";
 
 const TILE = 512;
 const LEVELS = [1, 4, 16]; // fator de redução de cada nível
@@ -14,6 +14,7 @@ export type ChartMeta = {
   name: string;
   scale: number;
   edition: string;
+  update?: string;
   importedAt: number;
   width: number;
   height: number;
@@ -102,6 +103,8 @@ async function importKap(fileName: string, data: Uint8Array, progress: ImportPro
   const g = fitGeoref(h);
   const id = fileName.replace(/\.kap$/i, "").toUpperCase();
   await deleteChart(id);
+  progress("analisando", 0);
+  const blank = blankMask(data, h);
 
   // Tabela de cores RGBA (índice 0 = transparente).
   const lut = new Uint32Array(256);
@@ -160,7 +163,8 @@ async function importKap(fileName: string, data: Uint8Array, progress: ImportPro
       progress("cortando blocos", y / h.height);
     }
     const base = (y - stripRow) * h.width;
-    for (let x = 0; x < h.width; x++) strip[base + x] = lut[row[x]];
+    const mrow = Math.floor(y / blank.cell) * blank.cw;
+    for (let x = 0; x < h.width; x++) strip[base + x] = blank.mask[mrow + Math.floor(x / blank.cell)] ? 0 : lut[row[x]];
   }
   await flush(stripRow);
 
@@ -176,7 +180,7 @@ async function importKap(fileName: string, data: Uint8Array, progress: ImportPro
 
   const a = pxToLatLon(g, 0, 0), b = pxToLatLon(g, h.width, h.height);
   const meta: ChartMeta = {
-    id, number: h.number || id, name: h.name, scale: h.scale, edition: h.edition, importedAt: Date.now(),
+    id, number: h.number || id, name: h.name, scale: h.scale, edition: h.edition, update: h.update, importedAt: Date.now(),
     width: h.width, height: h.height, georef: g,
     bounds: [[Math.min(a.lat, b.lat), Math.min(a.lon, b.lon)], [Math.max(a.lat, b.lat), Math.max(a.lon, b.lon)]],
     levels: levels.map(({ factor, cols, rows, w, h: hh }) => ({ factor, cols, rows, w, h: hh })),

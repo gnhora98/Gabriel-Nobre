@@ -11,5 +11,5 @@
     "skipLibCheck": true,
     "isolatedModules": true
   },
-  "include": ["src", "netlify/functions", "tests"]
+  "include": ["src", "netlify/functions"]
 }
