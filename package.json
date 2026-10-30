@@ -1,0 +1,39 @@
+{
+  "name": "carta-bts",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gnhora98/Gabriel-Nobre.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gnhora98/Gabriel-Nobre/issues"
+  },
+  "homepage": "https://github.com/gnhora98/Gabriel-Nobre#readme",
+  "dependencies": {
+    "fflate": "^0.8.3",
+    "idb-keyval": "^6.3.0",
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^6.0.3",
+    "@types/leaflet": "^1.9.22",
+    "@types/node": "^26.6.6",
+    "pngjs": "^7.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^5.0.5"
+  },
+  "private": true,
+  "type": "module"
+}
