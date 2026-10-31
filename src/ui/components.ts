@@ -1,7 +1,9 @@
 import { LEVELS, type Level } from "../lib/surf";
 import { NAV_LEVELS, type NavLevel } from "../lib/navcond";
 import { tideExtremes, tideHeight, tideSeries, tideTrend, tideRange } from "../lib/tide";
-import { DAY, fmtTime, num, relTime } from "../lib/util";
+import { DAY, fmtDayNum, fmtTime, fmtWeekday, num, relTime } from "../lib/util";
+import { t } from "../i18n";
+import { height, heightNum } from "../units";
 import { state } from "../state";
 import tideData from "../data/tide-salvador.json";
 
@@ -23,7 +25,7 @@ export function navBadge(level: NavLevel, sub: string): string {
   const L = NAV_LEVELS[level];
   return `<div class="navbadge">
     <div class="mini"><div class="fill" style="height:${pct}%;background:${L.color}"></div></div>
-    <div><div class="cap">Condição</div><div class="word" style="color:${L.color}">${L.word}</div><div class="sub">${sub}</div></div>
+    <div><div class="cap">${t("cond")}</div><div class="word" style="color:${L.color}">${L.word}</div><div class="sub">${sub}</div></div>
   </div>`;
 }
 
@@ -79,19 +81,19 @@ export function tidePanel(day: number, opts: { compact?: boolean } = {}): string
   const ex = tideExtremes(day, day + DAY);
   const isToday = now >= day && now < day + DAY;
   const range = tideRange(day);
-  const kind = range > 2.0 ? "sizígia (maré grande)" : range < 1.3 ? "quadratura (maré pequena)" : "maré média";
+  const kind = t(range > 2.0 ? "tide.spring" : range < 1.3 ? "tide.neap" : "tide.mid");
   const obs = isToday ? observedTide() : null;
   const head = isToday
-    ? `<div class="tidenow"><b>${num(tideHeight(now), 2)} m</b><span>${tideTrend(now) === "enchendo" ? "enchendo ↑" : "vazando ↓"}</span></div>
-       ${obs ? `<div class="muted small">Medido no marégrafo de Salvador: <b>${num(obs.h, 2)} m</b> (${relTime(obs.time)})</div>` : ""}`
+    ? `<div class="tidenow"><b>${height(tideHeight(now), 2)}</b><span>${t(tideTrend(now) === "enchendo" ? "tide.rising" : "tide.falling")}</span></div>
+       ${obs ? `<div class="muted small">${t("tide.measured", { h: height(obs.h, 2), t: relTime(obs.time) })}</div>` : ""}`
     : "";
   return `<div class="card tide ${opts.compact ? "compact" : ""}">
     ${head}
-    ${lineChart(series, { from: day, to: day + DAY, min: -0.3, max: 2.9, now: isToday ? now : undefined, color: "#5cc8ff" })}
+    ${lineChart(series.map((p) => ({ t: p.t, v: heightNum(p.v) })), { from: day, to: day + DAY, min: heightNum(-0.3), max: heightNum(2.9), now: isToday ? now : undefined, color: "var(--hi)" })}
     <div class="extremes">${ex
-      .map((e) => `<div><span>${fmtTime(e.time)}</span><span class="${e.kind === "high" ? "hi" : "lo"}">${e.kind === "high" ? "Preamar" : "Baixa-mar"} ${num(e.height, 1)} m</span></div>`)
+      .map((e) => `<div><span>${fmtTime(e.time)}</span><span class="${e.kind === "high" ? "hi" : "lo"}">${t(e.kind === "high" ? "tide.high" : "tide.low")} ${height(e.height, 1)}</span></div>`)
       .join("")}</div>
-    <div class="muted small">${kind} · amplitude ${num(range, 1)} m · alturas acima do NR (Z0 = ${num(tideData.datumOffset * 100, 1)} cm, DHN)</div>
+    <div class="muted small">${t("tide.foot", { k: kind, r: height(range, 1), z: num(tideData.datumOffset * 100, 1) })}</div>
   </div>`;
 }
 
@@ -99,8 +101,8 @@ export function dayChips(days: number[], selected: number, dots?: (d: number) =>
   return `<div class="days">${days
     .map((d, i) => {
       const dot = dots?.(d);
-      const lbl = i === 0 ? "Hoje" : new Date(d + 12 * 3_600_000).toLocaleDateString("pt-BR", { weekday: "short", timeZone: "America/Bahia" }).replace(".", "");
-      const n = new Date(d + 12 * 3_600_000).toLocaleDateString("pt-BR", { day: "numeric", timeZone: "America/Bahia" });
+      const lbl = i === 0 ? t("today") : fmtWeekday(d);
+      const n = fmtDayNum(d);
       return `<button class="day ${d === selected ? "sel" : ""}" data-day="${d}">${lbl}<b>${n}</b>${dot ? `<span style="background:${dot}"></span>` : ""}</button>`;
     })
     .join("")}</div>`;
@@ -108,9 +110,9 @@ export function dayChips(days: number[], selected: number, dots?: (d: number) =>
 
 export function statusLine(): string {
   const b = state.bundle;
-  const net = state.online ? "" : `<span class="off">● Offline</span> `;
-  if (state.loading) return `${net}<span class="muted">Atualizando dados…</span>`;
-  if (!b) return `${net}<span class="muted">Sem previsão salva ainda. Conecte à internet uma vez.</span>`;
-  const err = state.error ? ` · <span class="warn">falhou ao atualizar</span>` : "";
-  return `${net}<span class="muted">Previsão de ${relTime(b.fetchedAt)}${err}</span>`;
+  const net = state.online ? "" : `<span class="off">● ${t("offline")}</span> `;
+  if (state.loading) return `${net}<span class="muted">${t("status.updating")}</span>`;
+  if (!b) return `${net}<span class="muted">${t("status.noData")}</span>`;
+  const err = state.error ? ` · <span class="warn">${t("status.failed")}</span>` : "";
+  return `${net}<span class="muted">${t("status.from", { t: relTime(b.fetchedAt) })}${err}</span>`;
 }

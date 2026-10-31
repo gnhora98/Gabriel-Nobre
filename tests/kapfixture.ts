@@ -14,7 +14,7 @@ export function makeKap(opts: { w: number; h: number; south: number; north: numb
     "KNP/SC=20000,GD=WGS84,PR=MERCATOR,PP=-13.0,PI=UNKNOWN,SP=UNKNOWN,SK=0.0",
     "    TA=90.0,UN=METERS,SD=MEAN LOWER LOW WATER,DX=2.0,DY=2.0",
     "CED/SE=1,RE=1,ED=01/01/2026",
-    "RGB/1,212,236,247", "RGB/2,243,230,184", "RGB/3,30,30,30", "RGB/4,210,30,30",
+    "RGB/1,212,236,247", "RGB/2,243,230,184", "RGB/3,30,30,30", "RGB/4,210,30,30", "RGB/5,255,255,255",
     ...refs, ...ply, "DTM/0.0,0.0",
   ].join("\r\n") + "\r\n";
   const out: number[] = [...new TextEncoder().encode(header), 0x1a, 0x00, 7];

@@ -4,16 +4,30 @@ import { BEACHES, marinePointFor, type Beach } from "../data/beaches";
 import type { Bundle, Marine, Weather } from "./forecast";
 import { hourIndex } from "./forecast";
 import { angleDiff, compass } from "./geo";
+import { t } from "../i18n";
+import { height } from "../units";
 import { tideHeight, tideTrend } from "./tide";
+import { fmtWeekday } from "./util";
 
 export type Level = 1 | 2 | 3 | 4 | 5;
-export const LEVELS: Record<Level, { label: string; short: string; color: string; text: string }> = {
-  1: { label: "Flat, vai pescar 🎣", short: "Ruim", color: "#6b7c8f", text: "#fff" },
-  2: { label: "Marolinha de rolê", short: "Médio", color: "#3fb6ff", text: "#06121d" },
-  3: { label: "Tá bom, partiu!", short: "Bom", color: "#21d07a", text: "#06121d" },
-  4: { label: "Tá clássico, irmão!", short: "Ótimo", color: "#ffb020", text: "#06121d" },
-  5: { label: "SWELLZÃO! Tá barril 🔥", short: "Swell", color: "#ff3b5c", text: "#fff" },
+// Frases informais traduzidas em i18n.ts (lv.N / lvs.N).
+const lv = (n: Level, color: string, text: string) => ({
+  get label() { return t(`lv.${n}`); },
+  get short() { return t(`lvs.${n}`); },
+  color,
+  text,
+});
+export const LEVELS: Record<Level, { readonly label: string; readonly short: string; color: string; text: string }> = {
+  1: lv(1, "#6b7c8f", "#fff"),
+  2: lv(2, "#3fb6ff", "#06121d"),
+  3: lv(3, "#21d07a", "#06121d"),
+  4: lv(4, "#ffb020", "#06121d"),
+  5: lv(5, "#ff3b5c", "#fff"),
 };
+
+/** Motivo da nota: chave de tradução + valores (traduzido só na hora de mostrar). */
+export type Reason = { k: string; v?: Record<string, string | number> };
+export const reasonText = (r: Reason) => t(r.k, r.v && Object.fromEntries(Object.entries(r.v).map(([k, v]) => [k, k === "d" ? compass(Number(v)) : k === "t" ? t(`tl.${v}`) : v])));
 
 export type SurfHour = {
   time: number;
@@ -28,7 +42,7 @@ export type SurfHour = {
   windKind: "terral" | "lateral" | "maral" | "fraco";
   tide: number;
   tideTrend: "enchendo" | "vazando";
-  reasons: string[];
+  reasons: Reason[];
 };
 
 export function levelOf(score: number): Level {
@@ -56,7 +70,7 @@ export function scoreHour(beach: Beach, m: Marine, w: Weather, i: number, t: num
   const wi = hourIndex(w.time, t);
   const swell = m.swell[i], swellDir = m.swellDir[i], period = m.swellPeriod[i];
   const windKn = w.windKn[wi], windDir = w.windDir[wi];
-  const reasons: string[] = [];
+  const reasons: Reason[] = [];
 
   // 1) Quanto do swell entra na praia (direção x orientação x abrigo).
   const dirOff = Math.abs(angleDiff(beach.facing, swellDir));
@@ -72,33 +86,33 @@ export function scoreHour(beach: Beach, m: Marine, w: Weather, i: number, t: num
   let score = interp(breakHeight, SIZE_CURVE);
   if (breakHeight < beach.minHeight) score *= breakHeight / beach.minHeight;
 
-  if (dirOff >= 100) reasons.push(`swell de ${compass(swellDir)} não entra aqui`);
-  else if (dirOff > 55) reasons.push(`swell de ${compass(swellDir)} entra meio de lado`);
-  else reasons.push(`swell de ${compass(swellDir)} bate de frente`);
+  if (dirOff >= 100) reasons.push({ k: "r.swellBlocked", v: { d: swellDir } });
+  else if (dirOff > 55) reasons.push({ k: "r.swellSide", v: { d: swellDir } });
+  else reasons.push({ k: "r.swellFront", v: { d: swellDir } });
 
   // 4) Período: curto = mar de vento sem força; longo = swell de fundo organizado.
-  if (period < 7) { score -= 0.8; reasons.push(`período curto (${period.toFixed(0)} s), mar mexido`); }
-  else if (period < 9) { score -= 0.3; reasons.push(`período médio (${period.toFixed(0)} s)`); }
-  else if (period >= 13) { score += 0.5; reasons.push(`swell de fundo (${period.toFixed(0)} s), onda com força`); }
-  else if (period >= 11) { score += 0.3; reasons.push(`período bom (${period.toFixed(0)} s)`); }
+  if (period < 7) { score -= 0.8; reasons.push({ k: "r.perShort", v: { p: period.toFixed(0) } }); }
+  else if (period < 9) { score -= 0.3; reasons.push({ k: "r.perMid", v: { p: period.toFixed(0) } }); }
+  else if (period >= 13) { score += 0.5; reasons.push({ k: "r.perGround", v: { p: period.toFixed(0) } }); }
+  else if (period >= 11) { score += 0.3; reasons.push({ k: "r.perGood", v: { p: period.toFixed(0) } }); }
 
   // 5) Vento: terral (offshore) limpa, maral (onshore) estraga.
   const offshoreFrom = (beach.facing + 180) % 360;
   const wOff = Math.abs(angleDiff(offshoreFrom, windDir));
   let windKind: SurfHour["windKind"];
-  if (windKn < 5) { windKind = "fraco"; score += 0.3; reasons.push("vento fraquinho, mar liso"); }
+  if (windKn < 5) { windKind = "fraco"; score += 0.3; reasons.push({ k: "r.calm" }); }
   else if (wOff <= 50) {
     windKind = "terral";
     score += windKn < 18 ? 0.6 : 0.1;
-    reasons.push(windKn < 18 ? "terral deixando a onda lisinha" : "terral forte, difícil de dropar");
+    reasons.push({ k: windKn < 18 ? "r.offshore" : "r.offshoreStrong" });
   } else if (wOff <= 115) {
     windKind = "lateral";
     score -= (windKn / 12) * 0.5;
-    reasons.push(`vento lateral de ${compass(windDir)}`);
+    reasons.push({ k: "r.cross", v: { d: windDir } });
   } else {
     windKind = "maral";
     score -= (windKn / 10) * 0.75;
-    reasons.push(windKn > 12 ? `maral forte de ${compass(windDir)}, mar picado` : `maral de ${compass(windDir)}`);
+    reasons.push({ k: windKn > 12 ? "r.onshoreStrong" : "r.onshore", v: { d: windDir } });
   }
 
   // 6) Maré preferida.
@@ -106,13 +120,13 @@ export function scoreHour(beach: Beach, m: Marine, w: Weather, i: number, t: num
   const tt = tideTrend(t);
   const tideLvl = tide < 0.8 ? "baixa" : tide > 1.7 ? "cheia" : "media";
   if (beach.tide !== "qualquer") {
-    if (tideLvl === beach.tide) { score += 0.3; reasons.push(`maré ${tideLvl}, do jeito que a praia gosta`); }
+    if (tideLvl === beach.tide) { score += 0.3; reasons.push({ k: "r.tideGood", v: { t: tideLvl } }); }
     else if ((beach.tide === "cheia" && tideLvl === "baixa") || (beach.tide === "baixa" && tideLvl === "cheia")) {
       score -= 0.5;
-      reasons.push(`maré ${tideLvl} não favorece`);
+      reasons.push({ k: "r.tideBad", v: { t: tideLvl } });
     }
   }
-  if (beach.bottom !== "areia" && tide < 0.5) { score -= 0.3; reasons.push("baixa-mar com fundo raso, cuidado"); }
+  if (beach.bottom !== "areia" && tide < 0.5) { score -= 0.3; reasons.push({ k: "r.shallow" }); }
 
   // Swell muito grande sempre vira "swellzão", mesmo com vento ruim.
   if (breakHeight > 2.4) score = Math.max(score, 4.3);
@@ -168,14 +182,12 @@ export function rankBeaches(b: Bundle, dayStart: number): { beach: Beach; day: S
 /** Frase informal explicando a nota. */
 export function explain(beach: Beach, d: SurfDay, next?: SurfDay[]): string {
   const h = d.best;
-  const tam = h.breakHeight < 0.4 ? "quase nada" : h.breakHeight < 0.8 ? "na altura da cintura" : h.breakHeight < 1.2 ? "no peito" : h.breakHeight < 1.8 ? "na cabeça" : "acima da cabeça";
-  let s = `Onda ${tam} (~${h.breakHeight.toFixed(1)} m): ${h.reasons.slice(0, 3).join("; ")}.`;
+  const sz = h.breakHeight < 0.4 ? 0 : h.breakHeight < 0.8 ? 1 : h.breakHeight < 1.2 ? 2 : h.breakHeight < 1.8 ? 3 : 4;
+  let s = t("explain", { s: t(`sz.${sz}`), h: height(h.breakHeight), r: h.reasons.slice(0, 3).map(reasonText).join("; ") });
   if (next?.length) {
     const top = next.reduce((a, c) => (c.best.score > a.best.score ? c : a));
-    if (top.best.score > d.best.score + 0.6) {
-      const dia = new Date(top.day + 12 * 3_600_000).toLocaleDateString("pt-BR", { weekday: "long", timeZone: "America/Bahia" });
-      s += ` Fica de olho: ${dia} promete "${LEVELS[top.best.level].label}".`;
-    }
+    if (top.best.score > d.best.score + 0.6) s += t("watch", { d: fmtWeekday(top.day, "long"), l: LEVELS[top.best.level].label });
   }
+  void beach;
   return s;
 }

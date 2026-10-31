@@ -1,9 +1,10 @@
 // Importa cartas raster do CHM (.zip ou .kap), corta em blocos com níveis de resolução
 // e guarda tudo no aparelho (IndexedDB). Uma GridLayer do Leaflet desenha os blocos sob demanda.
 import L from "leaflet";
+import { t } from "../i18n";
 import { unzipSync } from "fflate";
 import { createStore, get, set, del, keys } from "idb-keyval";
-import { fitGeoref, kapRows, latLonToPx, parseKapHeader, pxToLatLon, toMercX, toMercY, type Georef, type KapHeader } from "./kap";
+import { blankMask, fitGeoref, kapRows, latLonToPx, parseKapHeader, pxToLatLon, toMercX, toMercY, type Georef, type KapHeader } from "./kap";
 
 const TILE = 512;
 const LEVELS = [1, 4, 16]; // fator de redução de cada nível
@@ -14,6 +15,7 @@ export type ChartMeta = {
   name: string;
   scale: number;
   edition: string;
+  update?: string;
   importedAt: number;
   width: number;
   height: number;
@@ -21,19 +23,41 @@ export type ChartMeta = {
   bounds: [[number, number], [number, number]]; // [[S,W],[N,E]]
   levels: { factor: number; cols: number; rows: number; w: number; h: number }[];
   file: string;
+  builtin?: string; // versão da carta incluída no app (ausente = importada pelo usuário)
+  base?: string; // cartas incluídas: pasta dos blocos PNG prontos (gerados por scripts/build-charts.ts)
 };
 
 const metaStore = createStore("cartas-meta", "meta");
 const tileStore = createStore("cartas-tiles", "tiles");
 
+let builtinCatalog: Promise<ChartMeta[]> | null = null;
+
+/** Cartas que já vêm no app (site e APK), prontas em public/charts. */
+function builtinCharts(): Promise<ChartMeta[]> {
+  builtinCatalog ??= fetch(`${import.meta.env.BASE_URL}charts/catalog.json`)
+    .then((r) => (r.ok ? r.json() : { cartas: [] }))
+    .then((d: { cartas: ChartMeta[] }) => d.cartas)
+    .catch(() => {
+      builtinCatalog = null;
+      return [];
+    });
+  return builtinCatalog;
+}
+
+/** Cartas incluídas + importadas pelo usuário (a importada substitui a incluída de mesmo número). */
 export async function listCharts(): Promise<ChartMeta[]> {
   const ks = await keys(metaStore);
-  const out: ChartMeta[] = [];
+  const mine: ChartMeta[] = [];
   for (const k of ks) {
     const m = await get<ChartMeta>(k, metaStore);
-    if (m) out.push(m);
+    if (!m) continue;
+    // cópia antiga de carta incluída (v1.1 processava no aparelho): agora vem pronta, apaga
+    if (m.builtin) void deleteChart(m.id);
+    else mine.push(m);
   }
-  return out.sort((a, b) => b.scale - a.scale);
+  const ids = new Set(mine.map((m) => m.id));
+  const all = [...(await builtinCharts()).filter((m) => !ids.has(m.id)), ...mine];
+  return all.sort((a, b) => b.scale - a.scale);
 }
 
 export async function deleteChart(id: string): Promise<void> {
@@ -85,7 +109,7 @@ export async function importChartFile(file: File, progress: ImportProgress = () 
   if (file.name.toLowerCase().endsWith(".zip") || (buf[0] === 0x50 && buf[1] === 0x4b)) {
     const files = unzipSync(buf, { filter: (f) => /\.kap$/i.test(f.name) });
     for (const [name, data] of Object.entries(files)) kaps.push({ name: name.split("/").pop()!, data });
-    if (!kaps.length) throw new Error("O .zip não tem arquivo .KAP. Baixe a versão BSB (não a GeoTIFF).");
+    if (!kaps.length) throw new Error(t("charts.noKap"));
   } else {
     kaps.push({ name: file.name, data: buf });
   }
@@ -102,6 +126,8 @@ async function importKap(fileName: string, data: Uint8Array, progress: ImportPro
   const g = fitGeoref(h);
   const id = fileName.replace(/\.kap$/i, "").toUpperCase();
   await deleteChart(id);
+  progress("analisando", 0);
+  const blank = blankMask(data, h);
 
   // Tabela de cores RGBA (índice 0 = transparente).
   const lut = new Uint32Array(256);
@@ -160,7 +186,8 @@ async function importKap(fileName: string, data: Uint8Array, progress: ImportPro
       progress("cortando blocos", y / h.height);
     }
     const base = (y - stripRow) * h.width;
-    for (let x = 0; x < h.width; x++) strip[base + x] = lut[row[x]];
+    const mrow = Math.floor(y / blank.cell) * blank.cw;
+    for (let x = 0; x < h.width; x++) strip[base + x] = blank.mask[mrow + Math.floor(x / blank.cell)] ? 0 : lut[row[x]];
   }
   await flush(stripRow);
 
@@ -176,7 +203,7 @@ async function importKap(fileName: string, data: Uint8Array, progress: ImportPro
 
   const a = pxToLatLon(g, 0, 0), b = pxToLatLon(g, h.width, h.height);
   const meta: ChartMeta = {
-    id, number: h.number || id, name: h.name, scale: h.scale, edition: h.edition, importedAt: Date.now(),
+    id, number: h.number || id, name: h.name, scale: h.scale, edition: h.edition, update: h.update, importedAt: Date.now(),
     width: h.width, height: h.height, georef: g,
     bounds: [[Math.min(a.lat, b.lat), Math.min(a.lon, b.lon)], [Math.max(a.lat, b.lat), Math.max(a.lon, b.lon)]],
     levels: levels.map(({ factor, cols, rows, w, h: hh }) => ({ factor, cols, rows, w, h: hh })),
@@ -194,14 +221,19 @@ const R = 6378137;
 const bitmapCache = new Map<string, Promise<ImageBitmap | null>>();
 const CACHE_MAX = 80;
 
-function loadBitmap(key: string): Promise<ImageBitmap | null> {
+function loadTile(m: ChartMeta, f: number, r: number, c: number): Promise<ImageBitmap | null> {
+  return m.base ? loadBitmap(`${import.meta.env.BASE_URL}${m.base}${f}/${r}-${c}.png`, true) : loadBitmap(`${m.id}/${f}/${r}/${c}`);
+}
+
+function loadBitmap(key: string, url = false): Promise<ImageBitmap | null> {
   let p = bitmapCache.get(key);
   if (p) {
     bitmapCache.delete(key);
     bitmapCache.set(key, p);
     return p;
   }
-  p = get<Blob>(key, tileStore).then((b) => (b ? createImageBitmap(b) : null)).catch(() => null);
+  const blob = url ? fetch(key).then((r) => (r.ok ? r.blob() : undefined)) : get<Blob>(key, tileStore);
+  p = blob.then((b) => (b ? createImageBitmap(b) : null)).catch(() => null);
   bitmapCache.set(key, p);
   if (bitmapCache.size > CACHE_MAX) {
     const first = bitmapCache.keys().next().value as string;
@@ -259,7 +291,7 @@ export class ChartLayer extends L.GridLayer {
       for (let r = r0; r <= r1; r++)
         for (let cc = c0; cc <= c1; cc++) {
           jobs.push(
-            loadBitmap(`${m.id}/${f}/${r}/${cc}`).then((bm) => {
+            loadTile(m, f, r, cc).then((bm) => {
               if (!bm) return;
               const dx = (cc * TILE - lx0) * sx, dy = (r * TILE - ly0) * sy;
               ctx.drawImage(bm, dx, dy, TILE * sx, TILE * sy);

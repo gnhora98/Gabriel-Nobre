@@ -8,7 +8,8 @@ export default async () => {
   });
   if (!r.ok) return new Response(JSON.stringify({ error: r.status }), { status: 502, headers: { "content-type": "application/json" } });
   return new Response(await r.text(), {
-    headers: { "content-type": "application/json", "cache-control": "public, max-age=300" },
+    // CORS liberado porque o app Android (origem https://localhost) também consulta esta função.
+    headers: { "content-type": "application/json", "cache-control": "public, max-age=300", "access-control-allow-origin": "*" },
   });
 };
 

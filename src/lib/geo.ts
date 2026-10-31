@@ -1,3 +1,4 @@
+import { coord } from "../units";
 const R_NM = 3440.065;
 const D2R = Math.PI / 180;
 
@@ -35,23 +36,9 @@ export function angleDiff(a: number, b: number): number {
   return d;
 }
 
-export function formatLat(lat: number): string {
-  const h = lat < 0 ? "S" : "N";
-  const a = Math.abs(lat);
-  const d = Math.floor(a);
-  return `${String(d).padStart(2, "0")}°${((a - d) * 60).toFixed(3).padStart(6, "0")}'${h}`;
-}
-
-export function formatLon(lon: number): string {
-  const h = lon < 0 ? "W" : "E";
-  const a = Math.abs(lon);
-  const d = Math.floor(a);
-  return `${String(d).padStart(3, "0")}°${((a - d) * 60).toFixed(3).padStart(6, "0")}'${h}`;
-}
+export const formatLat = (lat: number) => coord(lat, true);
+export const formatLon = (lon: number) => coord(lon, false);
 
 export const KN_PER_MS = 1.943844;
 
-const COMPASS = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSO", "SO", "OSO", "O", "ONO", "NO", "NNO"];
-export function compass(deg: number): string {
-  return COMPASS[Math.round((((deg % 360) + 360) % 360) / 22.5) % 16];
-}
+export { compass } from "../i18n";

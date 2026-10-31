@@ -15,10 +15,19 @@ export type Beach = {
   tide: "baixa" | "media" | "cheia" | "qualquer";
   bottom: "areia" | "pedra" | "recife" | "misto";
   notes: string;
+  cams?: Cam[];
 };
 
+// Câmeras ao vivo gratuitas. Os provedores não permitem exibir dentro de outro app,
+// então o botão abre a página da câmera no navegador.
+export type Cam = { name: string; url: string; provider: string };
+
 export const BEACHES: Beach[] = [
-  { id: "farol-barra", name: "Farol da Barra", city: "Salvador", lat: -13.0105, lon: -38.5326, facing: 195, exposure: 0.6, minHeight: 1.2, tide: "media", bottom: "pedra", notes: "Só funciona com swell grande de S/SO; abrigada do leste." },
+  { id: "farol-barra", name: "Farol da Barra", city: "Salvador", lat: -13.0105, lon: -38.5326, facing: 195, exposure: 0.6, minHeight: 1.2, tide: "media", bottom: "pedra", notes: "Só funciona com swell grande de S/SO; abrigada do leste.",
+    cams: [
+      { name: "Praia da Barra", url: "https://www.climaaovivo.com.br/ba/salvador/salvador-monte-pascoal-hotel-praia-da-barra", provider: "Clima ao Vivo" },
+      { name: "Av. Oceânica / Farol", url: "https://www.climaaovivo.com.br/ba/salvador/salvador-monte-pascoal-hotel-barra", provider: "Clima ao Vivo" },
+    ] },
   { id: "rio-vermelho", name: "Rio Vermelho / Paciência", city: "Salvador", lat: -13.0125, lon: -38.4905, facing: 170, exposure: 0.8, minHeight: 0.9, tide: "media", bottom: "pedra", notes: "Fundo de pedra; gosta de swell de S/SSE." },
   { id: "amaralina", name: "Amaralina", city: "Salvador", lat: -13.013, lon: -38.472, facing: 160, exposure: 0.85, minHeight: 0.8, tide: "media", bottom: "recife", notes: "Bancada de recife, melhor na meia-maré." },
   { id: "pituba", name: "Pituba", city: "Salvador", lat: -13.0055, lon: -38.457, facing: 150, exposure: 0.8, minHeight: 0.8, tide: "cheia", bottom: "recife", notes: "Recifes na baixa-mar; melhor com maré mais cheia." },

@@ -12,6 +12,7 @@ export type KapHeader = {
   projection: string;
   datum: string;
   edition: string;
+  update: string; // último Aviso aos Navegantes aplicado (NTM), ex. "2024-80 (06/10/2024)"
   palette: [number, number, number][]; // índice → RGB (índice 0 não usado)
   refs: RefPoint[];
   ply: { lat: number; lon: number }[];
@@ -39,7 +40,7 @@ export function parseKapHeader(buf: Uint8Array): KapHeader {
     else if (raw.trim()) lines.push(raw.trim());
   }
   const h: KapHeader = {
-    name: "", number: "", width: 0, height: 0, scale: 0, projection: "", datum: "", edition: "",
+    name: "", number: "", width: 0, height: 0, scale: 0, projection: "", datum: "", edition: "", update: "",
     palette: [], refs: [], ply: [], dtm: { lat: 0, lon: 0 }, dataOffset: 0, depth: 7,
   };
   for (const line of lines) {
@@ -71,6 +72,11 @@ export function parseKapHeader(buf: Uint8Array): KapHeader {
       case "CED": {
         const f = fields(body);
         h.edition = f.ED ?? f.SE ?? "";
+        break;
+      }
+      case "NTM": {
+        const f = fields(body);
+        if (f.NE) h.update = f.ND ? `${f.NE} (${f.ND})` : f.NE;
         break;
       }
       case "RGB": {
@@ -192,3 +198,41 @@ export const latLonToPx = (g: Georef, lat: number, lon: number) => ({
   x: g.ax * toMercX(lon) + g.bx,
   y: g.ay * toMercY(lat) + g.by,
 });
+
+// ---------- Áreas em branco (fora do desenho) ----------
+
+/**
+ * Detecta regiões brancas "vazias" que encostam nos cantos da carta (ex.: área fora de um plano
+ * com borda diagonal). No papel elas não têm informação, mas branco também é a cor de água funda,
+ * então se ficarem por cima de outra carta escondem áreas rasas. Retorna uma grade (célula de
+ * `cell` px) com 1 nas células a deixar transparentes.
+ */
+export function blankMask(buf: Uint8Array, h: KapHeader, cell = 4): { cell: number; cw: number; ch: number; mask: Uint8Array } {
+  const cw = Math.ceil(h.width / cell), ch = Math.ceil(h.height / cell);
+  const white = new Uint8Array(256);
+  h.palette.forEach((c, i) => { if (c && c[0] >= 250 && c[1] >= 250 && c[2] >= 250) white[i] = 1; });
+  // célula "toda branca" só se todos os pixels dela forem brancos
+  const allWhite = new Uint8Array(cw * ch).fill(1);
+  for (const [y, row] of kapRows(buf, h)) {
+    const base = Math.floor(y / cell) * cw;
+    for (let x = 0; x < h.width; x++) if (!white[row[x]]) allWhite[base + Math.floor(x / cell)] = 0;
+  }
+  const mask = new Uint8Array(cw * ch);
+  const stack: number[] = [];
+  for (const start of [0, cw - 1, (ch - 1) * cw, ch * cw - 1]) {
+    if (!allWhite[start] || mask[start]) continue;
+    const region: number[] = [];
+    stack.push(start);
+    mask[start] = 1;
+    while (stack.length) {
+      const i = stack.pop()!;
+      region.push(i);
+      const x = i % cw, y = (i - x) / cw;
+      const nb = [x > 0 ? i - 1 : -1, x < cw - 1 ? i + 1 : -1, y > 0 ? i - cw : -1, y < ch - 1 ? i + cw : -1];
+      for (const n of nb) if (n >= 0 && allWhite[n] && !mask[n]) { mask[n] = 1; stack.push(n); }
+    }
+    // Região enorme provavelmente é água funda de verdade: mantém.
+    if (region.length > cw * ch * 0.5) for (const i of region) mask[i] = 0;
+  }
+  return { cell, cw, ch, mask };
+}

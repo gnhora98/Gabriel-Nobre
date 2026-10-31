@@ -8,6 +8,8 @@ import { hourIndex } from "../lib/forecast";
 import { DAY, dayStart, esc, fmtDate, fmtTime, fmtWeekday, num, storageGet, storageSet, cap } from "../lib/util";
 import { state, onData } from "../state";
 import { dayChips, navBadge, navScale, tidePanel } from "../ui/components";
+import { locale, t } from "../i18n";
+import { dist, distUnit, distVal, height, speedUnit, speedVal, wind } from "../units";
 
 type BoatMode = "lancha" | "veleiro";
 type Panel = null | "trilha" | "waypoints" | "mares" | "cartas" | "condicao";
@@ -37,17 +39,17 @@ export function navView(root: HTMLElement): () => void {
       <button class="navbadge-btn" id="cond"></button>
     </div>
     <div class="fabs">
-      <button class="fab" id="wptHere" title="Marcar waypoint aqui">⚑</button>
-      <button class="fab" id="center" title="Centralizar no barco">◎</button>
+      <button class="fab" id="wptHere" title="${t("nav.markHere")}">⚑</button>
+      <button class="fab" id="center" title="${t("nav.center")}">◎</button>
     </div>
     <div class="posline" id="pos"></div>
     <div class="sheet" id="sheet"></div>
     <nav class="bottombar">
-      <button data-p="trilha"><i>●</i>Trilha</button>
-      <button data-p="waypoints"><i>⚑</i>Waypoints</button>
-      <button data-p="mares"><i>≈</i>Marés</button>
-      <button data-p="cartas"><i>🗺</i>Cartas</button>
-      <a href="#/"><i>⌂</i>Início</a>
+      <button data-p="trilha"><i>●</i>${t("bb.track")}</button>
+      <button data-p="waypoints"><i>⚑</i>${t("bb.wpts")}</button>
+      <button data-p="mares"><i>≈</i>${t("bb.tides")}</button>
+      <button data-p="cartas"><i>🗺</i>${t("bb.charts")}</button>
+      <a href="#/"><i>⌂</i>${t("tab.home")}</a>
     </nav>
   </div>`;
 
@@ -79,10 +81,6 @@ export function navView(root: HTMLElement): () => void {
   (async () => {
     [waypoints, tracks, charts] = await Promise.all([loadWaypoints(), loadTracks(), listCharts()]);
     chartLayer.setCharts(charts);
-    if (charts.length && !fix) {
-      const b = L.latLngBounds(charts.map((c) => c.bounds).flat() as L.LatLngTuple[]);
-      map.fitBounds(b);
-    }
     drawWaypoints();
     renderAll();
   })();
@@ -91,9 +89,9 @@ export function navView(root: HTMLElement): () => void {
     const b = state.bundle;
     if (!b) return null;
     if (b.metar && b.metar.windDir != null && Date.now() - b.metar.time < 2 * 3_600_000)
-      return { dir: b.metar.windDir, kn: b.metar.windKn, src: "aeroporto" };
+      return { dir: b.metar.windDir, kn: b.metar.windKn, src: t("src.airport") };
     const i = hourIndex(b.weather.time, Date.now());
-    return { dir: b.weather.windDir[i], kn: b.weather.windKn[i], src: "previsão" };
+    return { dir: b.weather.windDir[i], kn: b.weather.windKn[i], src: t("src.forecast") };
   };
 
   function target(): Waypoint | undefined {
@@ -102,72 +100,72 @@ export function navView(root: HTMLElement): () => void {
 
   // ----- render -----
   function renderTop() {
-    const t = target();
+    const wp = target();
     const sog = fix ? fix.sog : null;
     const cog = fix?.cog ?? null;
-    const dist = fix && t ? distanceNm(fix, t) : null;
-    const brg = fix && t ? bearingDeg(fix, t) : null;
+    const dNm = fix && wp ? distanceNm(fix, wp) : null;
+    const brg = fix && wp ? bearingDeg(fix, wp) : null;
     const cell = (k: string, v: string, u = "") => `<div class="m"><span>${k}</span><b>${v}${u ? `<small>${u}</small>` : ""}</b></div>`;
     let html: string;
     if (mode === "lancha") {
-      html = cell("SOG", sog != null ? num(sog) : "--", " nós") + cell("COG", cog != null ? `${String(Math.round(cog)).padStart(3, "0")}°` : "---") +
-        (t ? cell(esc(t.name).slice(0, 12), dist != null ? num(dist, dist < 10 ? 2 : 1) : "--", " NM") : cell("Waypoint", "—"));
+      html = cell("SOG", sog != null ? speedVal(sog) : "--", ` ${speedUnit()}`) + cell("COG", cog != null ? `${String(Math.round(cog)).padStart(3, "0")}°` : "---") +
+        (wp ? cell(esc(wp.name).slice(0, 12), dNm != null ? distVal(dNm) : "--", ` ${distUnit()}`) : cell(t("top.wpt"), "—"));
     } else {
-      const wind = windNow();
+      const wnd = windNow();
       let vmg = "--", side = "--", sideColor = "";
-      if (fix && cog != null && wind) {
-        const rel = angleDiff(cog, wind.dir);
-        side = rel >= 0 ? "BE" : "BB";
+      if (fix && cog != null && wnd) {
+        const rel = angleDiff(cog, wnd.dir);
+        side = rel >= 0 ? t("stb") : t("port");
         sideColor = rel >= 0 ? "#21d07a" : "#ff3b5c";
-        const ref = brg ?? wind.dir;
-        vmg = num(fix.sog * Math.cos((angleDiff(cog, ref) * Math.PI) / 180));
+        const ref = brg ?? wnd.dir;
+        vmg = speedVal(fix.sog * Math.cos((angleDiff(cog, ref) * Math.PI) / 180));
       }
-      html = cell("SOG", sog != null ? num(sog) : "--") + cell(t ? "VMG wpt" : "VMG vento", vmg) +
-        `<div class="m"><span>Bordo</span><b style="color:${sideColor}">${side}</b></div>`;
+      html = cell("SOG", sog != null ? speedVal(sog) : "--", ` ${speedUnit()}`) + cell(wp ? t("vmg.wpt") : t("vmg.wind"), vmg) +
+        `<div class="m"><span>${t("tack")}</span><b style="color:${sideColor}">${side}</b></div>`;
     }
     $("#top").innerHTML = html;
-    $("#modesw").innerHTML = `<button class="${mode === "lancha" ? "on" : ""}" data-m="lancha">Lancha</button><button class="${mode === "veleiro" ? "on" : ""}" data-m="veleiro">Veleiro</button>`;
+    $("#modesw").innerHTML = `<button class="${mode === "lancha" ? "on" : ""}" data-m="lancha">${t("boat.motor")}</button><button class="${mode === "veleiro" ? "on" : ""}" data-m="veleiro">${t("boat.sail")}</button>`;
     $("#modesw").querySelectorAll<HTMLButtonElement>("button").forEach((b) =>
       b.addEventListener("click", () => { mode = b.dataset.m as BoatMode; storageSet("boatMode", mode); renderAll(); }),
     );
 
     // linha de posição
-    let pos = gpsErr ? `<span class="warn">${gpsErr}</span>` : fix ? `${formatLat(fix.lat)} ${formatLon(fix.lon)} · ±${Math.round(fix.acc)} m` : "Aguardando GPS…";
-    if (fix && t && dist != null && brg != null) {
-      const eta = fix.sog > 0.5 ? (dist / fix.sog) * 60 : null;
-      pos += `<br>${esc(t.name)}: ${String(Math.round(brg)).padStart(3, "0")}° · ${num(dist, 2)} NM${eta != null ? ` · ETA ${eta < 90 ? Math.round(eta) + " min" : num(eta / 60) + " h"}` : ""}`;
+    let pos = gpsErr ? `<span class="warn">${t(gpsErr)}</span>` : fix ? `${formatLat(fix.lat)} ${formatLon(fix.lon)} · ±${Math.round(fix.acc)} m` : t("gps.waiting");
+    if (fix && wp && dNm != null && brg != null) {
+      const eta = fix.sog > 0.5 ? (dNm / fix.sog) * 60 : null;
+      pos += `<br>${esc(wp.name)}: ${String(Math.round(brg)).padStart(3, "0")}° · ${dist(dNm, 2)}${eta != null ? ` · ETA ${eta < 90 ? Math.round(eta) + " min" : num(eta / 60) + " h"}` : ""}`;
     }
     if (mode === "veleiro") {
       const w = windNow();
-      if (w) pos += `<br>Vento ${compass(w.dir)} ${Math.round(w.kn)} nós (${w.src})`;
+      if (w) pos += `<br>${t("windLine", { d: compass(w.dir), w: wind(w.kn), src: w.src })}`;
     }
-    if (recording) pos += `<br><span class="rec">● gravando ${num(trackLengthNm(recording), 2)} NM</span>`;
+    if (recording) pos += `<br><span class="rec">${t("recording", { d: dist(trackLengthNm(recording), 2) })}</span>`;
     $("#pos").innerHTML = pos;
 
     // termômetro
     const b = state.bundle;
     if (b) {
       const c = navCondition(b, Date.now());
-      $("#cond").innerHTML = navBadge(c.level, `${compass(c.windDir)} ${Math.round(c.windKn)} nós · ondas ${num(c.wave)} m`);
-    } else $("#cond").innerHTML = `<div class="navbadge"><div><div class="cap">Condição</div><div class="word" style="color:#8aa0b6">SEM DADOS</div><div class="sub">conecte à internet uma vez</div></div></div>`;
+      $("#cond").innerHTML = navBadge(c.level, t("cond.sub", { d: compass(c.windDir), w: wind(c.windKn), h: height(c.wave) }));
+    } else $("#cond").innerHTML = `<div class="navbadge"><div><div class="cap">${t("cond")}</div><div class="word" style="color:#8aa0b6">${t("cond.noData")}</div><div class="sub">${t("cond.connect")}</div></div></div>`;
   }
 
   function renderMapOverlays() {
-    const t = target();
+    const wp = target();
     if (fix) {
       boat.setLatLng([fix.lat, fix.lon]).addTo(map);
       accCircle.setLatLng([fix.lat, fix.lon]).setRadius(fix.acc).addTo(map);
       const el = (boat.getElement()?.querySelector(".boat-arrow") as HTMLElement | null);
       if (el) el.style.transform = `rotate(${fix.cog ?? 0}deg)`;
       if (follow) map.setView([fix.lat, fix.lon], Math.max(map.getZoom(), 13), { animate: false });
-      goLine.setLatLngs(t ? [[fix.lat, fix.lon], [t.lat, t.lon]] : []);
+      goLine.setLatLngs(wp ? [[fix.lat, fix.lon], [wp.lat, wp.lon]] : []);
     } else goLine.setLatLngs([]);
     laylines.clearLayers();
-    const wind = windNow();
-    if (mode === "veleiro" && t && wind) {
+    const wnd = windNow();
+    if (mode === "veleiro" && wp && wnd) {
       for (const s of [-45, 45]) {
-        const p = destination(t, (wind.dir + 180 + s + 360) % 360, 3);
-        L.polyline([[t.lat, t.lon], [p.lat, p.lon]], { color: "#1f8fff", weight: 1.2, dashArray: "2 5" }).addTo(laylines);
+        const p = destination(wp, (wnd.dir + 180 + s + 360) % 360, 3);
+        L.polyline([[wp.lat, wp.lon], [p.lat, p.lon]], { color: "#1f8fff", weight: 1.2, dashArray: "2 5" }).addTo(laylines);
       }
     }
     trackLine.setLatLngs(recording ? recording.points.map(([a, o]) => [a, o] as L.LatLngTuple) : []);
@@ -188,41 +186,41 @@ export function navView(root: HTMLElement): () => void {
     sheet.classList.add("open");
     let body = "";
     if (panel === "trilha") {
-      body = `<h3>Trilha</h3>
-        <button class="btn ${recording ? "danger" : "primary"}" id="recBtn">${recording ? "■ Parar e salvar" : "● Começar a gravar"}</button>
-        <div class="list">${tracks.slice().reverse().map((t) => `<div class="item"><div><b>${esc(t.name)}</b><br><span class="muted small">${cap(fmtDate(dayStart(t.start)))} · ${num(trackLengthNm(t), 2)} NM</span></div>
-          <div class="acts"><button data-show="${t.id}">ver</button><button data-gpx="${t.id}">GPX</button><button data-del="${t.id}">✕</button></div></div>`).join("") || `<p class="muted">Nenhuma trilha salva.</p>`}</div>`;
+      body = `<h3>${t("track.title")}</h3>
+        <button class="btn ${recording ? "danger" : "primary"}" id="recBtn">${recording ? t("track.stop") : t("track.start")}</button>
+        <div class="list">${tracks.slice().reverse().map((tr) => `<div class="item"><div><b>${esc(tr.name)}</b><br><span class="muted small">${cap(fmtDate(dayStart(tr.start)))} · ${dist(trackLengthNm(tr), 2)}</span></div>
+          <div class="acts"><button data-show="${tr.id}">${t("act.view")}</button><button data-gpx="${tr.id}">GPX</button><button data-del="${tr.id}">✕</button></div></div>`).join("") || `<p class="muted">${t("track.none")}</p>`}</div>`;
     } else if (panel === "waypoints") {
-      body = `<h3>Waypoints</h3><p class="muted small">Toque em ⚑ pra marcar onde o barco está, ou segure o dedo no mapa pra marcar um ponto.</p>
+      body = `<h3>${t("wpt.title")}</h3><p class="muted small">${t("wpt.help")}</p>
         <div class="list">${waypoints.map((w) => {
           const d = fix ? distanceNm(fix, w) : null;
-          return `<div class="item ${w.id === activeWpt ? "sel" : ""}"><div><b>${esc(w.name)}</b><br><span class="muted small">${formatLat(w.lat)} ${formatLon(w.lon)}${d != null ? ` · ${num(d, 2)} NM ${String(Math.round(bearingDeg(fix!, w))).padStart(3, "0")}°` : ""}</span></div>
-          <div class="acts"><button data-go="${w.id}">${w.id === activeWpt ? "parar" : "ir"}</button><button data-ren="${w.id}">✎</button><button data-del="${w.id}">✕</button></div></div>`;
-        }).join("") || `<p class="muted">Nenhum waypoint.</p>`}</div>`;
+          return `<div class="item ${w.id === activeWpt ? "sel" : ""}"><div><b>${esc(w.name)}</b><br><span class="muted small">${formatLat(w.lat)} ${formatLon(w.lon)}${d != null ? ` · ${dist(d, 2)} ${String(Math.round(bearingDeg(fix!, w))).padStart(3, "0")}°` : ""}</span></div>
+          <div class="acts"><button data-go="${w.id}">${w.id === activeWpt ? t("act.stop") : t("act.go")}</button><button data-ren="${w.id}">✎</button><button data-del="${w.id}">✕</button></div></div>`;
+        }).join("") || `<p class="muted">${t("wpt.none")}</p>`}</div>`;
     } else if (panel === "mares") {
       const days = Array.from({ length: 7 }, (_, i) => dayStart(Date.now()) + i * DAY);
-      body = `<h3>Marés · Porto de Salvador</h3>${dayChips(days, tideDay)}${tidePanel(tideDay)}`;
+      body = `<h3>${t("tides.title")}</h3>${dayChips(days, tideDay)}${tidePanel(tideDay)}`;
     } else if (panel === "condicao") {
       const b = state.bundle;
-      if (!b) body = `<h3>Condição de navegação</h3><p class="muted">Sem previsão salva. Conecte à internet uma vez.</p>`;
+      if (!b) body = `<h3>${t("cond.title")}</h3><p class="muted">${t("cond.noSaved")}</p>`;
       else {
         const c = navCondition(b, Date.now());
         const days = Array.from({ length: 7 }, (_, i) => dayStart(Date.now()) + i * DAY);
-        body = `<h3>Condição de navegação (BTS)</h3>
+        body = `<h3>${t("cond.title")}</h3>
           <div class="condnow">${navScale(c.level)}<div><b style="color:${NAV_LEVELS[c.level].color};font-size:22px">${NAV_LEVELS[c.level].word}</b><p>${NAV_LEVELS[c.level].hint}</p>
-          <p class="muted small">Vento ${compass(c.windDir)} ${Math.round(c.windKn)} nós (rajadas ${Math.round(c.gustKn)}) · ondas ${num(c.wave)} m na entrada da baía (dentro da BTS o mar costuma ser menor)</p></div></div>
-          <div class="list">${days.map((d, i) => { const n = navDay(b, d); return `<div class="item"><div><b>${i === 0 ? "Hoje" : cap(fmtWeekday(d, "long"))}</b><br><span class="muted small">até ${Math.round(n.windKn)} nós ${compass(n.windDir)} · raj ${Math.round(n.gustKn)} · ${num(n.wave)} m (${fmtTime(n.time)})</span></div><span class="tag" style="background:${NAV_LEVELS[n.level].color};color:#06121d">${NAV_LEVELS[n.level].word}</span></div>`; }).join("")}</div>`;
+          <p class="muted small">${t("cond.detail", { d: compass(c.windDir), w: wind(c.windKn), g: wind(c.gustKn), h: height(c.wave) })}</p></div></div>
+          <div class="list">${days.map((d, i) => { const n = navDay(b, d); return `<div class="item"><div><b>${i === 0 ? t("today") : cap(fmtWeekday(d, "long"))}</b><br><span class="muted small">${t("cond.day", { w: wind(n.windKn), d: compass(n.windDir), g: wind(n.gustKn), h: height(n.wave), t: fmtTime(n.time) })}</span></div><span class="tag" style="background:${NAV_LEVELS[n.level].color};color:#06121d">${NAV_LEVELS[n.level].word}</span></div>`; }).join("")}</div>`;
       }
     } else if (panel === "cartas") {
-      body = `<h3>Cartas náuticas oficiais</h3>
-        <p class="small">As cartas raster da Marinha (CHM) são gratuitas. Baixe a versão <b>BSB (.zip)</b> de cada carta da Baía de Todos os Santos (série 1100) e importe aqui. Ficam salvas no aparelho e funcionam sem internet.</p>
-        <a class="btn" href="https://www.marinha.mil.br/chm/dados-do-segnav/cartas-raster" target="_blank" rel="noopener">1. Abrir site de cartas do CHM</a>
-        <label class="btn primary">2. Importar arquivos .zip / .kap<input type="file" id="chartFile" accept=".zip,.kap,.KAP,application/zip" multiple hidden></label>
+      body = `<h3>${t("charts.title")}</h3>
+        <p class="small">${t("charts.help")}</p>
+        <a class="btn" href="https://www.marinha.mil.br/chm/dados-do-segnav/cartas-raster" target="_blank" rel="noopener">${t("charts.site")}</a>
+        <label class="btn primary">${t("charts.import")}<input type="file" id="chartFile" multiple hidden></label>
         <div id="importMsg" class="muted small">${importStatus}</div>
-        <div class="list">${charts.map((c) => `<div class="item"><div><b>${esc(c.number)} ${esc(c.name)}</b><br><span class="muted small">1:${c.scale.toLocaleString("pt-BR")}${c.edition ? ` · edição ${esc(c.edition)}` : ""} · importada ${new Date(c.importedAt).toLocaleDateString("pt-BR")}</span></div>
-          <div class="acts"><button data-zoom="${c.id}">ver</button><button data-delc="${c.id}">✕</button></div></div>`).join("") || `<p class="muted">Nenhuma carta importada ainda.</p>`}</div>
-        <label class="toggle"><input type="checkbox" id="baseTgl" ${showBase ? "checked" : ""}> Mostrar mapa OpenStreetMap/OpenSeaMap por baixo (precisa de internet)</label>
-        <p class="muted small">Confira periodicamente os Avisos aos Navegantes no site do CHM e reimporte a carta quando sair edição nova.</p>`;
+        <div class="list">${charts.map((c) => `<div class="item"><div><b>${esc(c.number)} ${esc(c.name)}</b><br><span class="muted small">1:${c.scale.toLocaleString(locale())}${c.update ? ` · ${t("charts.updated", { u: esc(c.update) })}` : c.edition ? ` · ${t("charts.edition", { e: esc(c.edition) })}` : ""} · ${c.builtin ? t("charts.builtin") : t("charts.imported", { d: new Date(c.importedAt).toLocaleDateString(locale()) })}</span></div>
+          <div class="acts"><button data-zoom="${c.id}">${t("act.view")}</button>${c.builtin ? "" : `<button data-delc="${c.id}">✕</button>`}</div></div>`).join("") || `<p class="muted">${t("charts.none")}</p>`}</div>
+        <label class="toggle"><input type="checkbox" id="baseTgl" ${showBase ? "checked" : ""}> ${t("charts.base")}</label>
+        <p class="muted small">${t("charts.notices")}</p>`;
     }
     sheet.innerHTML = `<div class="grab" id="closeSheet"></div>${body}`;
     $("#closeSheet").addEventListener("click", () => { panel = null; renderSheet(); });
@@ -236,33 +234,33 @@ export function navView(root: HTMLElement): () => void {
         if (recording.points.length > 1) { tracks.push(recording); await saveTracks(tracks); }
         recording = null;
       } else {
-        recording = { id: newId(), name: `Trilha ${cap(fmtDate(dayStart(Date.now())))} ${fmtTime(Date.now())}`, start: Date.now(), points: [] };
+        recording = { id: newId(), name: t("track.name", { d: cap(fmtDate(dayStart(Date.now()))), t: fmtTime(Date.now()) }), start: Date.now(), points: [] };
         if (fix) recording.points.push([fix.lat, fix.lon, fix.time]);
       }
       renderAll();
     });
     sheet.querySelectorAll<HTMLButtonElement>("[data-show]").forEach((b) => b.addEventListener("click", () => {
-      const t = tracks.find((x) => x.id === b.dataset.show);
+      const tr = tracks.find((x) => x.id === b.dataset.show);
       savedTracksLayer.clearLayers();
-      if (t && t.points.length > 1) {
-        const line = L.polyline(t.points.map(([a, o]) => [a, o] as L.LatLngTuple), { color: "#c040ff", weight: 3, opacity: 0.8 }).addTo(savedTracksLayer);
+      if (tr && tr.points.length > 1) {
+        const line = L.polyline(tr.points.map(([a, o]) => [a, o] as L.LatLngTuple), { color: "#c040ff", weight: 3, opacity: 0.8 }).addTo(savedTracksLayer);
         follow = false;
         map.fitBounds(line.getBounds(), { padding: [30, 30] });
         panel = null; renderSheet();
       }
     }));
     sheet.querySelectorAll<HTMLButtonElement>("[data-gpx]").forEach((b) => b.addEventListener("click", () => {
-      const t = tracks.find((x) => x.id === b.dataset.gpx);
-      if (!t) return;
+      const tr = tracks.find((x) => x.id === b.dataset.gpx);
+      if (!tr) return;
       const a = document.createElement("a");
-      a.href = URL.createObjectURL(new Blob([trackToGpx(t)], { type: "application/gpx+xml" }));
-      a.download = `${t.name.replace(/[^\w-]+/g, "_")}.gpx`;
+      a.href = URL.createObjectURL(new Blob([trackToGpx(tr)], { type: "application/gpx+xml" }));
+      a.download = `${tr.name.replace(/[^\w-]+/g, "_")}.gpx`;
       a.click();
     }));
     sheet.querySelectorAll<HTMLButtonElement>("[data-del]").forEach((b) => b.addEventListener("click", async () => {
       const id = b.dataset.del!;
-      if (panel === "trilha") { if (!confirm("Apagar trilha?")) return; tracks = tracks.filter((t) => t.id !== id); await saveTracks(tracks); savedTracksLayer.clearLayers(); }
-      else { if (!confirm("Apagar waypoint?")) return; waypoints = waypoints.filter((w) => w.id !== id); if (activeWpt === id) setActive(null); await saveWaypoints(waypoints); drawWaypoints(); }
+      if (panel === "trilha") { if (!confirm(t("track.del"))) return; tracks = tracks.filter((tr) => tr.id !== id); await saveTracks(tracks); savedTracksLayer.clearLayers(); }
+      else { if (!confirm(t("wpt.del"))) return; waypoints = waypoints.filter((w) => w.id !== id); if (activeWpt === id) setActive(null); await saveWaypoints(waypoints); drawWaypoints(); }
       renderAll();
     }));
     sheet.querySelectorAll<HTMLButtonElement>("[data-go]").forEach((b) => b.addEventListener("click", () => {
@@ -272,7 +270,7 @@ export function navView(root: HTMLElement): () => void {
     sheet.querySelectorAll<HTMLButtonElement>("[data-ren]").forEach((b) => b.addEventListener("click", async () => {
       const w = waypoints.find((x) => x.id === b.dataset.ren);
       if (!w) return;
-      const n = prompt("Nome do waypoint", w.name);
+      const n = prompt(t("wpt.name"), w.name);
       if (n) { w.name = n.slice(0, 40); await saveWaypoints(waypoints); drawWaypoints(); renderAll(); }
     }));
     sheet.querySelectorAll<HTMLButtonElement>(".day").forEach((b) => b.addEventListener("click", () => { tideDay = Number(b.dataset.day); renderSheet(); }));
@@ -286,12 +284,12 @@ export function navView(root: HTMLElement): () => void {
           await importChartFile(f, (m, p) => { msg.textContent = `${m} ${Math.round(p * 100)}%`; });
           ok++;
         } catch (err) {
-          importStatus += `<span class="warn">Erro em ${esc(f.name)}: ${esc(err instanceof Error ? err.message : String(err))}</span><br>`;
+          importStatus += `<span class="warn">${t("charts.err", { f: esc(f.name), e: esc(err instanceof Error ? err.message : String(err)) })}</span><br>`;
         }
       }
       charts = await listCharts();
       chartLayer.setCharts(charts);
-      importStatus += ok ? `${ok} arquivo(s) importado(s).` : "";
+      importStatus += ok ? t("charts.ok", { n: ok }) : "";
       renderSheet();
     });
     sheet.querySelectorAll<HTMLButtonElement>("[data-zoom]").forEach((b) => b.addEventListener("click", () => {
@@ -299,7 +297,7 @@ export function navView(root: HTMLElement): () => void {
       if (c) { follow = false; map.fitBounds(c.bounds as L.LatLngBoundsExpression); panel = null; renderSheet(); }
     }));
     sheet.querySelectorAll<HTMLButtonElement>("[data-delc]").forEach((b) => b.addEventListener("click", async () => {
-      if (!confirm("Remover esta carta do aparelho?")) return;
+      if (!confirm(t("charts.del"))) return;
       await deleteChart(b.dataset.delc!);
       charts = await listCharts();
       chartLayer.setCharts(charts);
@@ -318,7 +316,7 @@ export function navView(root: HTMLElement): () => void {
   }
 
   async function addWaypoint(lat: number, lon: number) {
-    const name = prompt("Nome do waypoint", `WPT ${waypoints.length + 1}`);
+    const name = prompt(t("wpt.name"), `WPT ${waypoints.length + 1}`);
     if (!name) return;
     waypoints.push({ id: newId(), name: name.slice(0, 40), lat, lon, created: Date.now() });
     await saveWaypoints(waypoints);
