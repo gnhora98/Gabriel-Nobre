@@ -15,14 +15,42 @@ const OUT = "public/charts";
 const TILE = 512;
 const LEVELS = [1, 4, 16];
 
-function kapFiles(): { name: string; data: Uint8Array }[] {
-  const out: { name: string; data: Uint8Array }[] = [];
+type KapFile = { name: string; data: Uint8Array; title?: string; number?: string };
+
+/** Lê o índice .BSB do zip: título oficial da carta e tipo de cada KAP (Base ou Inset/plano). */
+function bsbIndex(text: string): Map<string, { title: string; number: string }> {
+  const lines: string[] = [];
+  for (const raw of text.split(/\r?\n/)) {
+    if (/^\s/.test(raw) && lines.length) lines[lines.length - 1] += "," + raw.trim();
+    else if (raw.trim()) lines.push(raw.trim());
+  }
+  const field = (l: string, k: string) => l.match(new RegExp(`${k}=([^,]*)`))?.[1]?.trim() ?? "";
+  const cht = lines.find((l) => l.startsWith("CHT/")) ?? "";
+  const chart = { title: field(cht, "NA"), number: field(cht, "NU") };
+  const out = new Map<string, { title: string; number: string }>();
+  for (const l of lines.filter((x) => /^K\d+\//.test(x))) {
+    const fn = field(l, "FN").toUpperCase();
+    // carta principal leva o título/número da folha; plano (inset) leva o próprio nome
+    if (field(l, "TY").toLowerCase() === "base") out.set(fn, chart);
+    else out.set(fn, { title: field(l, "NA").replace(/_+$/, ""), number: field(l, "NU") });
+  }
+  return out;
+}
+
+function kapFiles(): KapFile[] {
+  const out: KapFile[] = [];
   for (const f of readdirSync(SRC).sort()) {
     const buf = new Uint8Array(readFileSync(join(SRC, f)));
     if (/\.kap$/i.test(f)) out.push({ name: f, data: buf });
     else if (/\.zip$/i.test(f)) {
-      const files = unzipSync(buf, { filter: (e) => /\.kap$/i.test(e.name) });
-      for (const [n, d] of Object.entries(files)) out.push({ name: n.split("/").pop()!, data: d });
+      const files = unzipSync(buf, { filter: (e) => /\.(kap|bsb)$/i.test(e.name) });
+      const bsb = Object.entries(files).find(([n]) => /\.bsb$/i.test(n));
+      const idx = bsb ? bsbIndex(new TextDecoder("latin1").decode(bsb[1])) : new Map();
+      for (const [n, d] of Object.entries(files)) {
+        if (!/\.kap$/i.test(n)) continue;
+        const name = n.split("/").pop()!;
+        out.push({ name, data: d, ...idx.get(name.toUpperCase()) });
+      }
     }
   }
   // um mesmo KAP pode vir solto e dentro do zip: fica um só
@@ -87,7 +115,7 @@ async function writeTiles(img: Uint8Array, w: number, h: number, dir: string) {
   return { cols, rows };
 }
 
-async function buildChart(name: string, data: Uint8Array): Promise<ChartMeta> {
+async function buildChart({ name, data, title, number }: KapFile): Promise<ChartMeta> {
   const h: KapHeader = parseKapHeader(data);
   const g: Georef = fitGeoref(h);
   const id = name.replace(/\.kap$/i, "").toUpperCase();
@@ -121,7 +149,7 @@ async function buildChart(name: string, data: Uint8Array): Promise<ChartMeta> {
 
   const a = pxToLatLon(g, 0, 0), b = pxToLatLon(g, h.width, h.height);
   return {
-    id, number: h.number || id, name: h.name, scale: h.scale, edition: h.edition, update: h.update, importedAt: 0,
+    id, number: number || h.number || id, name: (title || h.name).replace(/_+$/, "").trim(), scale: h.scale, edition: h.edition, update: h.update, importedAt: 0,
     width: h.width, height: h.height, georef: g,
     bounds: [[Math.min(a.lat, b.lat), Math.min(a.lon, b.lon)], [Math.max(a.lat, b.lat), Math.max(a.lon, b.lon)]],
     levels, file: name, builtin: h.update || h.edition || "1", base: `charts/${id}/`,
@@ -133,7 +161,7 @@ rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 const catalog: ChartMeta[] = [];
 for (const k of kapFiles()) {
-  const m = await buildChart(k.name, k.data);
+  const m = await buildChart(k);
   catalog.push(m);
   console.log(`carta ${m.id} (${m.name}) 1:${m.scale} — ${m.levels.map((l) => `${l.cols}x${l.rows}`).join(", ")} blocos`);
 }
