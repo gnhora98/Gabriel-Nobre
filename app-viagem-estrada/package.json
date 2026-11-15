@@ -1,0 +1,10 @@
+{
+  "name": "app-viagem-estrada",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Planejamento de viagens de estrada com autonomia e postos",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  }
+}

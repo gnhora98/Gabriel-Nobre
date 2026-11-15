@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:2240px;background:#0b0f14;font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;color:#e8edf2;padding:56px}
+h1{font-size:46px;font-weight:800}h1 span{color:#f5a524}
+.sub{color:#8696a8;font-size:22px;margin-top:6px}
+.label{font-size:20px;font-weight:700;color:#f5a524;letter-spacing:2px;text-transform:uppercase;margin:44px 0 16px}
+.row{display:flex;gap:40px;align-items:flex-start}
+.cap{margin-top:12px;font-size:19px;color:#9fb0c2;line-height:1.4}
+.cap b{color:#fff}
+/* head unit */
+.hu{width:1044px;height:560px;border-radius:22px;background:#000;border:10px solid #1c232c;position:relative;overflow:hidden}
+.rail{position:absolute;left:0;top:0;bottom:0;width:78px;background:#0e1217;display:flex;flex-direction:column;align-items:center;gap:26px;padding-top:24px}
+.rail i{width:34px;height:34px;border-radius:10px;background:#232b35;display:block}
+.rail i.on{background:#f5a524}
+.rail .clock{color:#cfd8e2;font-size:16px;font-weight:600}
+.scr{position:absolute;left:78px;top:0;right:0;bottom:0}
+/* welcome */
+.welcome{background:radial-gradient(circle at 30% 40%,#1d2733,#06090c 70%);display:flex;align-items:center;padding:0 50px;gap:30px}
+.welcome .veh{width:430px}
+.wbox h2{font-size:34px;font-weight:800}
+.wbox .muted{color:#8fa0b3;font-size:19px;margin-top:6px}
+.wcard{margin-top:22px;background:#151d26;border-radius:16px;padding:18px 20px;width:420px}
+.wcard .t{font-size:16px;color:#8fa0b3;text-transform:uppercase;letter-spacing:1px}
+.wcard .r{font-size:24px;font-weight:700;margin-top:4px}
+.wcard .n{font-size:17px;color:#c3cfdb;margin-top:6px}
+.play{margin-top:18px;display:flex;gap:12px}
+.btn{border-radius:14px;padding:16px 22px;font-size:20px;font-weight:700;background:#232c37;color:#dbe4ee}
+.btn.p{background:#f5a524;color:#1a1200;padding:16px 34px}
+/* nav */
+.map{background:#121a22}
+.map svg{position:absolute;inset:0}
+.turn{position:absolute;left:20px;top:20px;width:330px;background:#0f5132;border-radius:16px;padding:16px 18px}
+.turn .d{font-size:34px;font-weight:800}.turn .s{font-size:19px;color:#d6f2e3;margin-top:2px}
+.side{position:absolute;right:16px;top:16px;bottom:16px;width:300px;display:flex;flex-direction:column;gap:12px}
+.card{background:rgba(14,19,25,.94);border-radius:14px;padding:14px 16px}
+.card .t{font-size:14px;color:#8fa0b3;text-transform:uppercase;letter-spacing:1px}
+.card .v{font-size:21px;font-weight:700;margin-top:4px}
+.card .m{font-size:15px;color:#b6c3d0;margin-top:4px}
+.bar{height:12px;border-radius:6px;background:#26313d;margin-top:10px;overflow:hidden}
+.bar b{display:block;height:100%;width:62%;background:linear-gradient(90deg,#f5a524,#36c27a)}
+.eta{position:absolute;left:20px;bottom:18px;display:flex;gap:10px}
+.chip{background:rgba(14,19,25,.94);border-radius:12px;padding:10px 14px;font-size:17px;color:#cfd8e2}
+.chip b{color:#fff}
+.chip.off{color:#9be3b8}
+/* phones */
+.ph{width:380px;height:780px;border-radius:44px;background:#0f141a;border:10px solid #1c232c;overflow:hidden;position:relative;padding:44px 22px 20px}
+.ph h3{font-size:26px;font-weight:800}
+.ph .muted{color:#8696a8;font-size:15px}
+.tabs{position:absolute;left:0;right:0;bottom:0;height:70px;background:#0a0e13;border-top:1px solid #1f2731;display:flex;justify-content:space-around;align-items:center;font-size:12px;color:#7d8da0}
+.tabs div{text-align:center}.tabs div.on{color:#f5a524}
+.tabs i{display:block;width:22px;height:22px;border-radius:7px;background:currentColor;opacity:.8;margin:0 auto 4px}
+.stage{margin-top:14px;height:250px;border-radius:20px;background:radial-gradient(ellipse at 50% 85%,#25313e 0,#121820 60%);position:relative;display:flex;align-items:center;justify-content:center}
+.rot{position:absolute;bottom:12px;left:0;right:0;text-align:center;color:#8fa0b3;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.c{padding:8px 12px;border-radius:999px;background:#1a222c;font-size:14px;color:#c8d3de}
+.c.on{background:#f5a524;color:#1a1200;font-weight:700}
+.sw{display:flex;gap:10px;margin-top:14px}
+.sw i{width:30px;height:30px;border-radius:50%;display:block;border:2px solid #0f141a}
+.sw i.on{outline:3px solid #f5a524}
+.kv{display:flex;justify-content:space-between;background:#151c24;border-radius:12px;padding:12px 14px;margin-top:10px;font-size:15px}
+.kv b{color:#f5a524}
+.tl{margin-top:14px}
+.st{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #1b232c;font-size:14px}
+.st .dot{width:16px;height:16px;border-radius:50%;margin-left:5px}
+.st small{display:block;color:#8696a8;font-size:12px}
+.st .k{font-size:12px;color:#8fa0b3}
+.dayh{margin-top:12px;font-size:13px;color:#f5a524;font-weight:700;letter-spacing:1px}
+.ctl{display:flex;gap:8px;margin-top:12px}
+.ctl div{flex:1;text-align:center;background:#1a222c;border-radius:10px;padding:10px 0;font-size:14px;font-weight:600}
+.ctl div.p{background:#f5a524;color:#1a1200}
+.sec{font-size:13px;color:#8fa0b3;text-transform:uppercase;letter-spacing:1px;margin-top:18px}
+.seg{display:flex;background:#151c24;border-radius:12px;padding:4px;margin-top:8px}
+.seg div{flex:1;text-align:center;padding:9px 0;font-size:14px;border-radius:9px;color:#b9c5d1}
+.seg div.on{background:#f5a524;color:#1a1200;font-weight:700}
+.th{display:flex;gap:10px;margin-top:8px}
+.th div{flex:1;height:60px;border-radius:12px;position:relative;font-size:12px;display:flex;align-items:flex-end;padding:6px;font-weight:600}
+.tog{display:flex;justify-content:space-between;align-items:center;background:#151c24;border-radius:12px;padding:12px 14px;margin-top:8px;font-size:15px}
+.sw2{width:42px;height:24px;border-radius:12px;background:#36c27a;position:relative}
+.sw2:after{content:"";position:absolute;right:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff}
+.sw2.off{background:#3a4552}.sw2.off:after{left:3px;right:auto}
+</style></head><body>
+
+<h1>App de viagem de estrada <span>·</span> telas ilustrativas</h1>
+<div class="sub">Rascunho para validar layout e funcionalidades — não é o visual final</div>
+
+<div class="label">Android Auto (multimídia)</div>
+<div class="row">
+ <div>
+  <div class="hu"><div class="rail"><div class="clock">06:58</div><i class="on"></i><i></i><i></i><i></i></div>
+   <div class="scr welcome">
+    <svg class="veh" viewBox="0 0 430 260">
+     <ellipse cx="215" cy="236" rx="190" ry="14" fill="#000" opacity=".55"/>
+     <circle cx="95" cy="190" r="52" fill="none" stroke="#2b3542" stroke-width="18"/><circle cx="95" cy="190" r="16" fill="#9aa7b4"/>
+     <circle cx="335" cy="190" r="52" fill="none" stroke="#2b3542" stroke-width="18"/><circle cx="335" cy="190" r="16" fill="#9aa7b4"/>
+     <path d="M95 190 L170 120 L250 120 L335 190" stroke="#8a96a3" stroke-width="8" fill="none"/>
+     <path d="M150 115 Q190 70 255 92 L275 120 L160 128 Z" fill="#7a1d1d"/>
+     <path d="M235 88 Q265 70 300 84 L292 104 L262 104 Z" fill="#932626"/>
+     <rect x="88" y="98" width="86" height="18" rx="9" fill="#2a2018"/>
+     <path d="M300 84 L330 60 L346 64" stroke="#cfd6dd" stroke-width="7" fill="none" stroke-linecap="round"/>
+     <circle cx="338" cy="96" r="14" fill="#f3f0d8"/>
+     <rect x="40" y="70" width="60" height="44" rx="6" fill="#1f262e"/><rect x="58" y="114" width="70" height="30" rx="6" fill="#1f262e"/>
+     <path d="M180 130 L240 130 L230 170 L190 170 Z" fill="#596572"/>
+    </svg>
+    <div class="wbox">
+     <h2>Bom dia, Gabriel</h2>
+     <div class="muted">Meteor 650 · vermelha · offline pronto ✓</div>
+     <div class="wcard"><div class="t">Continuar viagem · Dia 4 de 8</div><div class="r">Fortaleza → Pipa</div><div class="n">600 km · próxima parada: Posto Dunorte (150 km)</div></div>
+     <div class="play"><div class="btn p">▶ Seguir viagem</div><div class="btn">Etapas</div></div>
+    </div>
+   </div></div>
+  <div class="cap"><b>1. Ao conectar:</b> foto do veículo escolhido + um botão só. O app lembra onde você parou ontem e segue dali.</div>
+ </div>
+ <div>
+  <div class="hu"><div class="rail"><div class="clock">08:41</div><i class="on"></i><i></i><i></i><i></i></div>
+   <div class="scr map">
+    <svg viewBox="0 0 966 540" preserveAspectRatio="none">
+     <rect width="966" height="540" fill="#121a22"/>
+     <path d="M-20 420 C120 380 200 300 330 280 S560 200 700 120 S880 40 1000 20" stroke="#1d2833" stroke-width="40" fill="none"/>
+     <path d="M0 120 L960 300" stroke="#18222c" stroke-width="18"/><path d="M200 540 L420 0" stroke="#18222c" stroke-width="14"/>
+     <path d="M380 540 C400 460 420 360 470 300 S600 160 640 90" stroke="#3aa0ff" stroke-width="16" fill="none" stroke-linecap="round"/>
+     <circle cx="640" cy="90" r="16" fill="#f5a524"/><text x="660" y="96" fill="#f5a524" font-size="18" font-weight="700">⛽ Dunorte</text>
+     <g transform="translate(392 430) rotate(-20)"><circle r="34" fill="#3aa0ff" opacity=".25"/><circle cx="-11" cy="0" r="8" fill="#fff"/><circle cx="11" cy="0" r="8" fill="#fff"/><path d="M-10 0 L0 -18 L10 0" stroke="#fff" stroke-width="5" fill="none"/><rect x="-6" y="-24" width="12" height="10" rx="3" fill="#e3342f"/></g>
+    </svg>
+    <div class="turn"><div class="d">↑ 38 km</div><div class="s">Siga na BR-304 → Aracati</div></div>
+    <div class="side">
+     <div class="card"><div class="t">Autonomia</div><div class="v">124 km restantes</div><div class="bar"><b></b></div><div class="m">Próximo posto em 38 km · margem ok</div></div>
+     <div class="card"><div class="t">Próxima etapa · 2/6</div><div class="v">⛽ Posto Dunorte</div><div class="m">Chegada 09:20 · parada 15 min</div></div>
+     <div class="card"><div class="t">Destino do dia</div><div class="v">🛏 Nirvana Pipa</div><div class="m">Chegada 15:20 · pôr do sol 17:28</div></div>
+    </div>
+    <div class="eta"><div class="chip"><b>480 km</b> até Pipa</div><div class="chip off">● Offline</div><div class="chip">⏭ Pular etapa</div></div>
+   </div></div>
+  <div class="cap"><b>2. Navegação:</b> ícone da moto no mapa, painel de autonomia com o próximo posto, etapa atual e aviso de pôr do sol. Funciona sem sinal.</div>
+ </div>
+</div>
+
+<div class="label">Celular (planejar e configurar)</div>
+<div class="row">
+ <div>
+  <div class="ph"><h3>Garagem</h3><div class="muted">Escolha o veículo da viagem</div>
+   <div class="stage">
+    <svg width="300" height="190" viewBox="0 0 430 260">
+     <ellipse cx="215" cy="236" rx="180" ry="12" fill="#000" opacity=".5"/>
+     <circle cx="95" cy="190" r="52" fill="none" stroke="#2b3542" stroke-width="18"/><circle cx="335" cy="190" r="52" fill="none" stroke="#2b3542" stroke-width="18"/>
+     <path d="M95 190 L170 120 L250 120 L335 190" stroke="#8a96a3" stroke-width="8" fill="none"/>
+     <path d="M150 115 Q190 70 255 92 L275 120 L160 128 Z" fill="#7a1d1d"/><path d="M235 88 Q265 70 300 84 L292 104 L262 104 Z" fill="#932626"/>
+     <rect x="88" y="98" width="86" height="18" rx="9" fill="#2a2018"/><circle cx="338" cy="96" r="14" fill="#f3f0d8"/>
+     <rect x="40" y="70" width="60" height="44" rx="6" fill="#1f262e"/>
+    </svg>
+    <div class="rot">⟲ arraste para girar 360°</div>
+   </div>
+   <div class="chips"><div class="c on">Meteor 650</div><div class="c">Moto custom</div><div class="c">Moto trail</div><div class="c">Hatch</div><div class="c">Sedã</div><div class="c">SUV</div></div>
+   <div class="sw"><i class="on" style="background:#8f2222"></i><i style="background:#1b1b1b"></i><i style="background:#e7e7e7"></i><i style="background:#1f4f8a"></i><i style="background:#3c5a3a"></i><i style="background:#c9a227"></i></div>
+   <div class="kv"><span>Autonomia</span><b>200 km</b></div>
+   <div class="kv"><span>Margem de segurança</span><b>30%</b></div>
+   <div class="kv"><span>Consumo médio</span><b>21,5 km/l</b></div>
+   <div class="tabs"><div><i></i>Viagens</div><div><i></i>Roteiro</div><div class="on"><i></i>Garagem</div><div><i></i>Ajustes</div></div>
+  </div>
+  <div class="cap"><b>3. Garagem:</b> modelos 3D (360°), cores, e os dados que<br>calculam onde abastecer.</div>
+ </div>
+ <div>
+  <div class="ph"><h3>Roteiro</h3><div class="muted">Salvador ⇄ Fortaleza · 8 dias · 3.370 km</div>
+   <div class="dayh">DIA 4 · TER 29/12 · FORTALEZA → PIPA</div>
+   <div class="tl">
+    <div class="st"><div class="dot" style="background:#36c27a"></div><div>Saída Fortaleza<small>05:00</small></div><div class="k">✓</div></div>
+    <div class="st"><div class="dot" style="background:#f5a524"></div><div>⛽ Posto Dunorte<small>sugerido · km 150</small></div><div class="k">atual</div></div>
+    <div class="st"><div class="dot" style="background:#f5a524"></div><div>⛽ Petrobras Mossoró<small>sugerido · km 245</small></div><div class="k">⋮</div></div>
+    <div class="st"><div class="dot" style="background:#3aa0ff"></div><div>🍽 Posto Fan · almoço<small>sua parada · km 385</small></div><div class="k">⋮</div></div>
+    <div class="st"><div class="dot" style="background:#f5a524"></div><div>⛽ Pinheiro Borges<small>sugerido · km 515</small></div><div class="k">⋮</div></div>
+    <div class="st"><div class="dot" style="background:#a678e8"></div><div>🛏 Nirvana Pipa<small>pernoite · 15:20</small></div><div class="k">⋮</div></div>
+   </div>
+   <div class="ctl"><div>◀ Voltar</div><div>✎ Editar</div><div class="p">Avançar ▶</div></div>
+   <div class="kv"><span>Mapas offline da viagem</span><b>✓ 412 MB</b></div>
+   <div class="tabs"><div><i></i>Viagens</div><div class="on"><i></i>Roteiro</div><div><i></i>Garagem</div><div><i></i>Ajustes</div></div>
+  </div>
+  <div class="cap"><b>4. Roteiro:</b> postos sugeridos pela autonomia, suas<br>paradas e hotéis. Avança, volta e edita.</div>
+ </div>
+ <div>
+  <div class="ph"><h3>Ajustes</h3><div class="muted">Também acessíveis na multimídia (parado)</div>
+   <div class="sec">Idioma</div><div class="seg"><div class="on">Português</div><div>English</div><div>Español</div></div>
+   <div class="sec">Tema</div>
+   <div class="th"><div style="background:#0f141a;border:2px solid #f5a524;color:#fff">Escuro</div><div style="background:#eef2f6;color:#222">Claro</div><div style="background:linear-gradient(135deg,#3b1d0b,#b4561b);color:#fff">Deserto</div><div style="background:linear-gradient(135deg,#06283d,#1a8a8a);color:#fff">Litoral</div></div>
+   <div class="sec">Navegação</div>
+   <div class="tog"><span>Voz em português</span><div class="sw2"></div></div>
+   <div class="tog"><span>Avisar antes do pôr do sol</span><div class="sw2"></div></div>
+   <div class="tog"><span>Evitar estradas de terra</span><div class="sw2"></div></div>
+   <div class="tog"><span>Tema automático (dia/noite)</span><div class="sw2 off"></div></div>
+   <div class="sec">Unidades</div><div class="seg"><div class="on">km · L</div><div>mi · gal</div></div>
+   <div class="tabs"><div><i></i>Viagens</div><div><i></i>Roteiro</div><div><i></i>Garagem</div><div class="on"><i></i>Ajustes</div></div>
+  </div>
+  <div class="cap"><b>5. Ajustes:</b> idiomas PT/EN/ES, temas escuro, claro<br>e personalizados.</div>
+ </div>
+</div>
+</body></html>

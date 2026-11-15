@@ -1,0 +1,62 @@
+{
+  "nome": "Salvador ⇄ Fortaleza de moto",
+  "veiculo": { "modelo": "Royal Enfield Meteor 650", "cor": "vermelha", "autonomia_km": 200, "margem_seguranca_pct": 30, "consumo_km_l": 21.5, "garupa": true },
+  "regras": { "nao_rodar_apos": "17:30", "intervalo_abastecimento_km": 140 },
+  "dias": [
+    { "data": "2026-12-14", "de": "Stella Maris, Salvador, BA", "para": "Maceió, AL", "km": 580, "saida": "05:30", "chegada": "15:30", "tipo_dia": "so_dormir",
+      "paradas": [
+        { "hora": "07:10", "km": 115, "nome": "Posto Linha Verde – Subaúma (BA-099)", "tipo": "abastecer", "lat": -12.3020442, "lng": -37.8996801, "obs": "Abre 6h. Quase o único posto entre Praia do Forte e Indiaroba" },
+        { "hora": "09:25", "km": 255, "nome": "Posto JB – Estância (BR-101 km 147)", "tipo": "abastecer", "lat": -11.2236626, "lng": -37.4217539 },
+        { "hora": "12:00", "km": 415, "nome": "Posto Frei Damião – Propriá (BR-101)", "tipo": "almoco_abastecer", "lat": -10.2253697, "lng": -36.8343598 },
+        { "hora": "14:30", "km": 520, "nome": "Posto Shell – São Miguel dos Campos", "tipo": "abastecer_opcional", "lat": -9.7762968, "lng": -36.1056072 },
+        { "hora": "15:30", "km": 580, "nome": "Hotel e Pousada Encanto dos Corais – Maceió", "tipo": "pernoite", "lat": -9.614861, "lng": -35.689457 }
+      ] },
+    { "data": "2026-12-15", "de": "Maceió, AL", "para": "Natal, RN", "km": 520, "saida": "06:00", "chegada": "15:15", "tipo_dia": "so_dormir",
+      "paradas": [
+        { "hora": "07:40", "km": 115, "nome": "Posto Novo Lino II (BR-101)", "tipo": "abastecer", "lat": -8.9484021, "lng": -35.6641835 },
+        { "hora": "09:10", "km": 200, "nome": "Posto BR Cotegy – Escada (BR-101)", "tipo": "abastecer", "lat": -8.4088441, "lng": -35.2783572 },
+        { "hora": "10:50", "km": 300, "nome": "Ecopostos Posto Fábrica – Goiana", "tipo": "abastecer", "lat": -7.6565231, "lng": -34.9407427 },
+        { "hora": "12:45", "km": 420, "nome": "Posto Petrobras Divisa PB/RN – Mamanguape", "tipo": "almoco_abastecer", "lat": -6.551796, "lng": -35.125853 },
+        { "hora": "15:15", "km": 520, "nome": "Economy Hotel – Ponta Negra, Natal", "tipo": "pernoite", "lat": -5.871641, "lng": -35.181429 }
+      ] },
+    { "data": "2026-12-16", "de": "Natal, RN", "para": "Fortaleza, CE", "km": 520, "saida": "06:00", "chegada": "15:00", "tipo_dia": "chegada",
+      "paradas": [
+        { "hora": "07:45", "km": 125, "nome": "Posto Odon – Lajes (BR-304)", "tipo": "abastecer", "lat": -5.7060168, "lng": -36.2249051 },
+        { "hora": "10:10", "km": 275, "nome": "Posto Petrobras – Mossoró (BR-304 km 46)", "tipo": "abastecer", "lat": -5.2280296, "lng": -37.3448907 },
+        { "hora": "11:45", "km": 370, "nome": "Posto Petrobras – Aracati", "tipo": "almoco_abastecer", "lat": -4.5644444, "lng": -37.7622222 },
+        { "hora": "15:00", "km": 520, "nome": "Fortaleza", "tipo": "chegada" }
+      ] },
+    { "data": "2026-12-29", "de": "Fortaleza, CE", "para": "Pipa, RN", "km": 600, "saida": "05:00", "chegada": "15:20", "tipo_dia": "passeio_noite",
+      "paradas": [
+        { "hora": "07:10", "km": 150, "nome": "Dunorte – Aracati (BR-304)", "tipo": "abastecer", "lat": -4.5774135, "lng": -37.8029212 },
+        { "hora": "08:45", "km": 245, "nome": "Posto Petrobras – Mossoró (BR-304 km 46)", "tipo": "abastecer", "lat": -5.2280296, "lng": -37.3448907 },
+        { "hora": "11:00", "km": 385, "nome": "Posto Fan – Angicos (BR-304)", "tipo": "almoco_abastecer", "lat": -5.690547, "lng": -36.306222 },
+        { "hora": "13:50", "km": 515, "nome": "Posto Pinheiro Borges – Parnamirim", "tipo": "abastecer", "lat": -5.8945563, "lng": -35.2581318 },
+        { "hora": "15:20", "km": 600, "nome": "Nirvana Pipa", "tipo": "pernoite", "lat": -6.233468, "lng": -35.046962 }
+      ] },
+    { "data": "2026-12-30", "de": "Pipa, RN", "para": "Porto de Galinhas, PE", "km": 305, "saida": "09:00", "chegada": "14:00", "tipo_dia": "praia_noite",
+      "paradas": [
+        { "hora": "10:00", "km": 70, "nome": "Posto Petrobras Divisa PB/RN", "tipo": "abastecer", "lat": -6.551796, "lng": -35.125853 },
+        { "hora": "12:00", "km": 190, "nome": "Ecopostos Posto Fábrica – Goiana", "tipo": "abastecer", "lat": -7.6565231, "lng": -34.9407427 },
+        { "hora": "14:00", "km": 305, "nome": "Manawa Beach Flats Prime – Porto de Galinhas", "tipo": "pernoite", "lat": -8.497582, "lng": -35.004775 }
+      ] },
+    { "data": "2026-12-31", "de": "Porto de Galinhas, PE", "para": "Maceió, AL", "km": 240, "saida": "09:00", "chegada": "13:00", "tipo_dia": "reveillon",
+      "paradas": [
+        { "hora": "09:40", "km": 45, "nome": "Posto BR Cotegy – Escada", "tipo": "abastecer", "lat": -8.4088441, "lng": -35.2783572 },
+        { "hora": "11:10", "km": 130, "nome": "Posto Novo Lino II", "tipo": "abastecer", "lat": -8.9484021, "lng": -35.6641835 },
+        { "hora": "13:00", "km": 240, "nome": "Hotel e Pousada Encanto dos Corais – Maceió", "tipo": "pernoite", "lat": -9.614861, "lng": -35.689457 }
+      ] },
+    { "data": "2027-01-01", "de": "Maceió, AL", "para": "Aracaju, SE", "km": 280, "saida": "12:00", "chegada": "16:30", "tipo_dia": "descanso",
+      "paradas": [
+        { "hora": "13:00", "km": 70, "nome": "Posto Shell – São Miguel dos Campos", "tipo": "abastecer", "lat": -9.7762968, "lng": -36.1056072 },
+        { "hora": "14:45", "km": 175, "nome": "Posto Frei Damião – Propriá", "tipo": "abastecer", "lat": -10.2253697, "lng": -36.8343598 },
+        { "hora": "16:30", "km": 280, "nome": "Aracaju (casa)", "tipo": "pernoite" }
+      ] },
+    { "data": "2027-01-02", "de": "Aracaju, SE", "para": "Stella Maris, Salvador, BA", "km": 325, "saida": "08:00", "chegada": "13:00", "tipo_dia": "chegada_casa",
+      "paradas": [
+        { "hora": "09:00", "km": 70, "nome": "Posto JB – Estância", "tipo": "abastecer", "lat": -11.2236626, "lng": -37.4217539 },
+        { "hora": "11:10", "km": 210, "nome": "Posto Linha Verde – Subaúma", "tipo": "abastecer", "lat": -12.3020442, "lng": -37.8996801 },
+        { "hora": "13:00", "km": 325, "nome": "Stella Maris", "tipo": "chegada" }
+      ] }
+  ]
+}
