@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Road Trip</string>
+
+    <string name="tab_trips">Trips</string>
+    <string name="tab_route">Itinerary</string>
+    <string name="tab_garage">Garage</string>
+    <string name="tab_settings">Settings</string>
+
+    <string name="greeting_morning">Good morning, %1$s</string>
+    <string name="greeting_afternoon">Good afternoon, %1$s</string>
+    <string name="greeting_evening">Good evening, %1$s</string>
+    <string name="continue_trip_day">Continue trip · Day %1$d of %2$d</string>
+    <string name="next_stop_summary">%1$s · next stop: %2$s (%3$s)</string>
+    <string name="follow_trip">▶ Continue trip</string>
+    <string name="stages">Stages</string>
+    <string name="trip_done">Trip completed</string>
+    <string name="restart_trip">Restart trip</string>
+    <string name="restart_confirm">Reset the trip to day 1?</string>
+    <string name="cancel">Cancel</string>
+    <string name="trip_summary">%1$d days · %2$s</string>
+    <string name="open_route">Open itinerary</string>
+    <string name="android_auto">Android Auto</string>
+    <string name="android_auto_hint">Connect your phone to the car display and open the app: it shows your vehicle and the Continue trip button, resuming from the stage saved here.</string>
+
+    <string name="route_subtitle">%1$s · %2$d days · %3$s</string>
+    <string name="day_header">DAY %1$d · %2$s · %3$s → %4$s</string>
+    <string name="day_times">Departure %1$s · arrival %2$s · %3$s</string>
+    <string name="gap_warning">Leg %1$s → %2$s (%3$s) exceeds the usable range of %4$s. Add a fuel stop.</string>
+    <string name="departure_from">Depart %1$s</string>
+    <string name="stop_suggested">fuel · %1$s</string>
+    <string name="stop_user">your stop · %1$s</string>
+    <string name="stop_overnight">overnight · %1$s</string>
+    <string name="stop_arrival">arrival · %1$s</string>
+    <string name="stop_current">current</string>
+    <string name="back">◀ Back</string>
+    <string name="edit">✎ Edit</string>
+    <string name="advance">Next ▶</string>
+    <string name="add_stop">+ Add stop</string>
+    <string name="offline_maps">Offline maps for this trip</string>
+    <string name="offline_maps_pending">next phase</string>
+    <string name="offline_data_ready">✓ Itinerary, fuel stops and progress are stored on the device</string>
+    <string name="set_current">Set as current stage</string>
+    <string name="new_stop_title">New stop</string>
+    <string name="edit_stop_title">Edit stop</string>
+    <string name="field_name">Name</string>
+    <string name="field_time">Time (HH:MM)</string>
+    <string name="field_km">Km into the day</string>
+    <string name="field_type">Type</string>
+    <string name="invalid_input">Check the name, time (HH:MM) and km.</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="type_fuel">Fuel</string>
+    <string name="type_meal_fuel">Lunch + fuel</string>
+    <string name="type_fuel_optional">Optional fuel</string>
+    <string name="type_overnight">Overnight</string>
+    <string name="type_arrival">Arrival</string>
+    <string name="type_user">Stop</string>
+
+    <string name="garage_subtitle">Choose the vehicle for this trip</string>
+    <string name="drag_to_rotate">⟲ drag to rotate</string>
+    <string name="range">Range</string>
+    <string name="margin">Safety margin</string>
+    <string name="consumption">Average consumption</string>
+    <string name="usable_range_hint">Usable range for fuel suggestions: %1$s</string>
+    <string name="vehicle_meteor">Meteor 650</string>
+    <string name="vehicle_custom">Cruiser</string>
+    <string name="vehicle_trail">Adventure bike</string>
+    <string name="vehicle_hatch">Hatchback</string>
+    <string name="vehicle_sedan">Sedan</string>
+    <string name="vehicle_suv">SUV</string>
+
+    <string name="settings_subtitle">Also applied on the car display</string>
+    <string name="language">Language</string>
+    <string name="theme">Theme</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_desert">Desert</string>
+    <string name="theme_coast">Coast</string>
+    <string name="navigation">Navigation</string>
+    <string name="voice">Voice announcements</string>
+    <string name="sunset_warning">Warn before sunset</string>
+    <string name="avoid_dirt">Avoid dirt roads</string>
+    <string name="auto_theme">Automatic theme (day/night)</string>
+    <string name="units">Units</string>
+    <string name="rider_name">Your name</string>
+
+    <string name="car_autonomy">Range</string>
+    <string name="car_km_left">%1$s left</string>
+    <string name="car_next_fuel">Next fuel in %1$s · %2$s</string>
+    <string name="car_margin_ok">margin ok</string>
+    <string name="car_low_range">low range</string>
+    <string name="car_no_fuel">No fuel stops ahead today</string>
+    <string name="car_next_stage">Next stage · %1$d/%2$d</string>
+    <string name="car_arrival_at">Arrive %1$s</string>
+    <string name="car_day_destination">Destination today</string>
+    <string name="car_sunset">sunset %1$s</string>
+    <string name="car_until">%1$s to %2$s</string>
+    <string name="car_head_to">Head to %1$s</string>
+    <string name="car_skip">Skip stage</string>
+    <string name="car_arrived">Arrived at %1$s</string>
+    <string name="car_sunset_warning">Sunset at %1$s. %2$s to go to %3$s.</string>
+    <string name="car_no_location">No location permission: open the app on your phone to allow it.</string>
+    <string name="car_offline">Offline</string>
+    <string name="car_online">Online</string>
+    <string name="car_route_schematic">Simplified map</string>
+</resources>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Viagem de Estrada</string>
+
+    <!-- Abas -->
+    <string name="tab_trips">Viagens</string>
+    <string name="tab_route">Roteiro</string>
+    <string name="tab_garage">Garagem</string>
+    <string name="tab_settings">Ajustes</string>
+
+    <!-- Boas-vindas / viagens -->
+    <string name="greeting_morning">Bom dia, %1$s</string>
+    <string name="greeting_afternoon">Boa tarde, %1$s</string>
+    <string name="greeting_evening">Boa noite, %1$s</string>
+    <string name="continue_trip_day">Continuar viagem · Dia %1$d de %2$d</string>
+    <string name="next_stop_summary">%1$s · próxima parada: %2$s (%3$s)</string>
+    <string name="follow_trip">▶ Seguir viagem</string>
+    <string name="stages">Etapas</string>
+    <string name="trip_done">Viagem concluída</string>
+    <string name="restart_trip">Recomeçar viagem</string>
+    <string name="restart_confirm">Voltar a viagem para o dia 1?</string>
+    <string name="cancel">Cancelar</string>
+    <string name="trip_summary">%1$d dias · %2$s</string>
+    <string name="open_route">Abrir roteiro</string>
+    <string name="android_auto">Android Auto</string>
+    <string name="android_auto_hint">Conecte o celular na multimídia e abra o app: ele mostra o veículo e o botão Seguir viagem, continuando da etapa salva aqui.</string>
+
+    <!-- Roteiro -->
+    <string name="route_subtitle">%1$s · %2$d dias · %3$s</string>
+    <string name="day_header">DIA %1$d · %2$s · %3$s → %4$s</string>
+    <string name="day_times">Saída %1$s · chegada %2$s · %3$s</string>
+    <string name="gap_warning">Trecho %1$s → %2$s (%3$s) passa da autonomia útil de %4$s. Adicione um posto.</string>
+    <string name="departure_from">Saída %1$s</string>
+    <string name="stop_suggested">posto · %1$s</string>
+    <string name="stop_user">sua parada · %1$s</string>
+    <string name="stop_overnight">pernoite · %1$s</string>
+    <string name="stop_arrival">chegada · %1$s</string>
+    <string name="stop_current">atual</string>
+    <string name="back">◀ Voltar</string>
+    <string name="edit">✎ Editar</string>
+    <string name="advance">Avançar ▶</string>
+    <string name="add_stop">+ Adicionar parada</string>
+    <string name="offline_maps">Mapas offline da viagem</string>
+    <string name="offline_maps_pending">próxima fase</string>
+    <string name="offline_data_ready">✓ Roteiro, postos e progresso já ficam salvos no aparelho</string>
+    <string name="set_current">Definir como etapa atual</string>
+    <string name="new_stop_title">Nova parada</string>
+    <string name="edit_stop_title">Editar parada</string>
+    <string name="field_name">Nome</string>
+    <string name="field_time">Horário (HH:MM)</string>
+    <string name="field_km">Km no dia</string>
+    <string name="field_type">Tipo</string>
+    <string name="invalid_input">Confira o nome, o horário (HH:MM) e o km.</string>
+    <string name="save">Salvar</string>
+    <string name="delete">Excluir</string>
+    <string name="type_fuel">Posto</string>
+    <string name="type_meal_fuel">Almoço + posto</string>
+    <string name="type_fuel_optional">Posto opcional</string>
+    <string name="type_overnight">Pernoite</string>
+    <string name="type_arrival">Chegada</string>
+    <string name="type_user">Parada</string>
+
+    <!-- Garagem -->
+    <string name="garage_subtitle">Escolha o veículo da viagem</string>
+    <string name="drag_to_rotate">⟲ arraste para girar</string>
+    <string name="range">Autonomia</string>
+    <string name="margin">Margem de segurança</string>
+    <string name="consumption">Consumo médio</string>
+    <string name="usable_range_hint">Autonomia útil para sugerir postos: %1$s</string>
+    <string name="vehicle_meteor">Meteor 650</string>
+    <string name="vehicle_custom">Moto custom</string>
+    <string name="vehicle_trail">Moto trail</string>
+    <string name="vehicle_hatch">Hatch</string>
+    <string name="vehicle_sedan">Sedã</string>
+    <string name="vehicle_suv">SUV</string>
+
+    <!-- Ajustes -->
+    <string name="settings_subtitle">Valem também para a multimídia</string>
+    <string name="language">Idioma</string>
+    <string name="theme">Tema</string>
+    <string name="theme_dark">Escuro</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_desert">Deserto</string>
+    <string name="theme_coast">Litoral</string>
+    <string name="navigation">Navegação</string>
+    <string name="voice">Avisos por voz</string>
+    <string name="sunset_warning">Avisar antes do pôr do sol</string>
+    <string name="avoid_dirt">Evitar estradas de terra</string>
+    <string name="auto_theme">Tema automático (dia/noite)</string>
+    <string name="units">Unidades</string>
+    <string name="rider_name">Seu nome</string>
+
+    <!-- Android Auto -->
+    <string name="car_autonomy">Autonomia</string>
+    <string name="car_km_left">%1$s restantes</string>
+    <string name="car_next_fuel">Próximo posto em %1$s · %2$s</string>
+    <string name="car_margin_ok">margem ok</string>
+    <string name="car_low_range">autonomia baixa</string>
+    <string name="car_no_fuel">Nenhum posto à frente hoje</string>
+    <string name="car_next_stage">Próxima etapa · %1$d/%2$d</string>
+    <string name="car_arrival_at">Chegada %1$s</string>
+    <string name="car_day_destination">Destino do dia</string>
+    <string name="car_sunset">pôr do sol %1$s</string>
+    <string name="car_until">%1$s até %2$s</string>
+    <string name="car_head_to">Siga para %1$s</string>
+    <string name="car_skip">Pular etapa</string>
+    <string name="car_arrived">Chegamos em %1$s</string>
+    <string name="car_sunset_warning">Pôr do sol às %1$s. Faltam %2$s até %3$s.</string>
+    <string name="car_no_location">Sem permissão de localização: abra o app no celular para liberar.</string>
+    <string name="car_offline">Offline</string>
+    <string name="car_online">Online</string>
+    <string name="car_route_schematic">Mapa simplificado</string>
+</resources>

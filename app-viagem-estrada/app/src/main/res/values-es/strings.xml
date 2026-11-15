@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Viaje por Carretera</string>
+
+    <string name="tab_trips">Viajes</string>
+    <string name="tab_route">Itinerario</string>
+    <string name="tab_garage">Garaje</string>
+    <string name="tab_settings">Ajustes</string>
+
+    <string name="greeting_morning">Buenos días, %1$s</string>
+    <string name="greeting_afternoon">Buenas tardes, %1$s</string>
+    <string name="greeting_evening">Buenas noches, %1$s</string>
+    <string name="continue_trip_day">Continuar viaje · Día %1$d de %2$d</string>
+    <string name="next_stop_summary">%1$s · próxima parada: %2$s (%3$s)</string>
+    <string name="follow_trip">▶ Seguir viaje</string>
+    <string name="stages">Etapas</string>
+    <string name="trip_done">Viaje terminado</string>
+    <string name="restart_trip">Reiniciar viaje</string>
+    <string name="restart_confirm">¿Volver el viaje al día 1?</string>
+    <string name="cancel">Cancelar</string>
+    <string name="trip_summary">%1$d días · %2$s</string>
+    <string name="open_route">Abrir itinerario</string>
+    <string name="android_auto">Android Auto</string>
+    <string name="android_auto_hint">Conecta el móvil a la pantalla del coche y abre la app: muestra el vehículo y el botón Seguir viaje, continuando desde la etapa guardada aquí.</string>
+
+    <string name="route_subtitle">%1$s · %2$d días · %3$s</string>
+    <string name="day_header">DÍA %1$d · %2$s · %3$s → %4$s</string>
+    <string name="day_times">Salida %1$s · llegada %2$s · %3$s</string>
+    <string name="gap_warning">El tramo %1$s → %2$s (%3$s) supera la autonomía útil de %4$s. Agrega una gasolinera.</string>
+    <string name="departure_from">Salida %1$s</string>
+    <string name="stop_suggested">gasolinera · %1$s</string>
+    <string name="stop_user">tu parada · %1$s</string>
+    <string name="stop_overnight">pernocta · %1$s</string>
+    <string name="stop_arrival">llegada · %1$s</string>
+    <string name="stop_current">actual</string>
+    <string name="back">◀ Volver</string>
+    <string name="edit">✎ Editar</string>
+    <string name="advance">Avanzar ▶</string>
+    <string name="add_stop">+ Agregar parada</string>
+    <string name="offline_maps">Mapas offline del viaje</string>
+    <string name="offline_maps_pending">próxima fase</string>
+    <string name="offline_data_ready">✓ Itinerario, gasolineras y progreso quedan guardados en el dispositivo</string>
+    <string name="set_current">Marcar como etapa actual</string>
+    <string name="new_stop_title">Nueva parada</string>
+    <string name="edit_stop_title">Editar parada</string>
+    <string name="field_name">Nombre</string>
+    <string name="field_time">Hora (HH:MM)</string>
+    <string name="field_km">Km en el día</string>
+    <string name="field_type">Tipo</string>
+    <string name="invalid_input">Revisa el nombre, la hora (HH:MM) y el km.</string>
+    <string name="save">Guardar</string>
+    <string name="delete">Eliminar</string>
+    <string name="type_fuel">Gasolinera</string>
+    <string name="type_meal_fuel">Almuerzo + gasolinera</string>
+    <string name="type_fuel_optional">Gasolinera opcional</string>
+    <string name="type_overnight">Pernocta</string>
+    <string name="type_arrival">Llegada</string>
+    <string name="type_user">Parada</string>
+
+    <string name="garage_subtitle">Elige el vehículo del viaje</string>
+    <string name="drag_to_rotate">⟲ arrastra para girar</string>
+    <string name="range">Autonomía</string>
+    <string name="margin">Margen de seguridad</string>
+    <string name="consumption">Consumo medio</string>
+    <string name="usable_range_hint">Autonomía útil para sugerir gasolineras: %1$s</string>
+    <string name="vehicle_meteor">Meteor 650</string>
+    <string name="vehicle_custom">Moto custom</string>
+    <string name="vehicle_trail">Moto trail</string>
+    <string name="vehicle_hatch">Hatchback</string>
+    <string name="vehicle_sedan">Sedán</string>
+    <string name="vehicle_suv">SUV</string>
+
+    <string name="settings_subtitle">También se aplican en la pantalla del coche</string>
+    <string name="language">Idioma</string>
+    <string name="theme">Tema</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_desert">Desierto</string>
+    <string name="theme_coast">Litoral</string>
+    <string name="navigation">Navegación</string>
+    <string name="voice">Avisos por voz</string>
+    <string name="sunset_warning">Avisar antes del atardecer</string>
+    <string name="avoid_dirt">Evitar caminos de tierra</string>
+    <string name="auto_theme">Tema automático (día/noche)</string>
+    <string name="units">Unidades</string>
+    <string name="rider_name">Tu nombre</string>
+
+    <string name="car_autonomy">Autonomía</string>
+    <string name="car_km_left">%1$s restantes</string>
+    <string name="car_next_fuel">Próxima gasolinera en %1$s · %2$s</string>
+    <string name="car_margin_ok">margen ok</string>
+    <string name="car_low_range">autonomía baja</string>
+    <string name="car_no_fuel">No hay gasolineras adelante hoy</string>
+    <string name="car_next_stage">Próxima etapa · %1$d/%2$d</string>
+    <string name="car_arrival_at">Llegada %1$s</string>
+    <string name="car_day_destination">Destino del día</string>
+    <string name="car_sunset">atardecer %1$s</string>
+    <string name="car_until">%1$s hasta %2$s</string>
+    <string name="car_head_to">Sigue hacia %1$s</string>
+    <string name="car_skip">Saltar etapa</string>
+    <string name="car_arrived">Llegamos a %1$s</string>
+    <string name="car_sunset_warning">Atardecer a las %1$s. Faltan %2$s hasta %3$s.</string>
+    <string name="car_no_location">Sin permiso de ubicación: abre la app en el móvil para permitirlo.</string>
+    <string name="car_offline">Offline</string>
+    <string name="car_online">Online</string>
+    <string name="car_route_schematic">Mapa simplificado</string>
+</resources>
