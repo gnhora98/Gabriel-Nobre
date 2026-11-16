@@ -109,6 +109,13 @@ class MapRenderer(private val density: Float) {
         }
     }
 
+    /** Só o painel lateral e os chips, por cima do mapa MapLibre. */
+    fun drawOverlay(c: Canvas, visible: Rect, snap: NavSnapshot, offline: Boolean, offlineLabel: String, roadLabel: String) {
+        val panelW = min(dp(300f), visible.width() * 0.34f)
+        drawPanel(c, RectF(visible.right - panelW - dp(12f), visible.top + dp(12f), visible.right - dp(12f), visible.bottom - dp(12f)), snap, true)
+        drawChips(c, Rect(visible.left, visible.top, (visible.right - panelW - dp(12f)).toInt(), visible.bottom), snap, true, offline, offlineLabel, roadLabel)
+    }
+
     private fun drawPanel(c: Canvas, area: RectF, snap: NavSnapshot, dark: Boolean) {
         val cardBg = if (dark) 0xF0161B22.toInt() else 0xF0FFFFFF.toInt()
         val text = if (dark) 0xFFE6EDF3.toInt() else 0xFF1F2328.toInt()

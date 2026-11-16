@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.viagemestrada.core.Day
+import com.viagemestrada.core.DayRoute
 import com.viagemestrada.core.Stop
 import com.viagemestrada.core.Trip
 import com.viagemestrada.core.TripProgress
@@ -23,6 +24,13 @@ class TripRepository private constructor(context: Context) {
     private val prefs: SharedPreferences =
         context.getSharedPreferences("viagem", Context.MODE_PRIVATE)
 
+    private val assets = context.assets
+
+    /** Viagens disponíveis no aparelho (arquivo em assets → id). A primeira é a padrão. */
+    val catalog: List<Trip> = CATALOG.map { file -> loadTrip(file) }
+
+    private val routeCache = mutableMapOf<String, List<DayRoute>>()
+
     private val _state = MutableStateFlow(load(context))
     val state: StateFlow<AppState> = _state.asStateFlow()
 
@@ -32,9 +40,7 @@ class TripRepository private constructor(context: Context) {
         prefs.getString(KEY_STATE, null)?.let { saved ->
             runCatching { return json.decodeFromString(AppState.serializer(), saved) }
         }
-        val trip = Trip.fromJson(
-            context.assets.open(SAMPLE_TRIP).bufferedReader().use { it.readText() },
-        )
+        val trip = catalog.first()
         // Primeira abertura: garagem começa com o veículo da viagem.
         val garage = Garage(
             rangeKm = trip.vehicle.rangeKm,
@@ -48,6 +54,24 @@ class TripRepository private constructor(context: Context) {
         val next = transform(_state.value)
         _state.value = next
         prefs.edit { putString(KEY_STATE, json.encodeToString(AppState.serializer(), next)) }
+    }
+
+    private fun loadTrip(file: String): Trip {
+        val trip = Trip.fromJson(assets.open(file).bufferedReader().use { it.readText() })
+        return if (trip.id.isBlank()) trip.copy(id = file.removeSuffix(".json")) else trip
+    }
+
+    /** Rotas reais (uma por dia) da viagem, embutidas em assets/rotas/<id>.json. */
+    fun routes(tripId: String = current.trip.id): List<DayRoute> = routeCache.getOrPut(tripId) {
+        runCatching {
+            DayRoute.listFromJson(assets.open("rotas/$tripId.json").bufferedReader().use { it.readText() })
+        }.getOrDefault(emptyList())
+    }
+
+    /** Troca a viagem ativa e volta para o início dela. */
+    fun selectTrip(id: String) {
+        val trip = catalog.firstOrNull { it.id == id } ?: return
+        update { it.copy(trip = trip, progress = TripProgress()) }
     }
 
     // ---- Progresso ----
@@ -88,8 +112,8 @@ class TripRepository private constructor(context: Context) {
     fun updateSettings(transform: (Settings) -> Settings) = update { it.copy(settings = transform(it.settings)) }
 
     companion object {
-        private const val KEY_STATE = "state_v1"
-        private const val SAMPLE_TRIP = "viagem-exemplo.json"
+        private const val KEY_STATE = "state_v3"
+        private val CATALOG = listOf("teste-stella-maris.json", "viagem-exemplo.json")
         private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
         @Volatile private var instance: TripRepository? = null

@@ -17,9 +17,14 @@ import kotlin.math.roundToInt
 object Format {
     private const val KM_PER_MI = 1.609344
 
-    fun distance(km: Double, units: Units): String = when (units) {
-        Units.KM -> "%,d km".format(Locale.getDefault(), km.roundToInt()).replace(',', '.')
-        Units.MI -> "%,d mi".format(Locale.getDefault(), (km / KM_PER_MI).roundToInt()).replace(',', '.')
+    fun distance(km: Double, units: Units): String {
+        val v = if (units == Units.KM) km else km / KM_PER_MI
+        val unit = if (units == Units.KM) "km" else "mi"
+        return when {
+            units == Units.KM && v < 1 -> "${(km * 1000 / 10).roundToInt() * 10} m"
+            v < 10 -> String.format(Locale.forLanguageTag("pt-BR"), "%.1f %s", v, unit)
+            else -> "%,d %s".format(Locale.getDefault(), v.roundToInt(), unit).replace(',', '.')
+        }
     }
 
     fun consumption(kmPerLiter: Double, units: Units): String = when (units) {

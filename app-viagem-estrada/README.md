@@ -29,6 +29,14 @@ Precisa do Android SDK (platform 36) com `sdk.dir` em `local.properties`.
 2. No Android Auto (celular): Ajustes → toque várias vezes em "Versão" para liberar o modo desenvolvedor → menu ⋮ → Configurações do desenvolvedor → ative **Fontes desconhecidas**.
 3. Abra o app no celular uma vez e permita a localização (usada para detectar a chegada em cada etapa).
 
+## Viagem de teste (0.3)
+
+O app abre com a viagem **Teste · Stella Maris** ativa: casa (Rua Ítalo Gaudenzi) → Colégio Marízia Maior → Redemix Supermercado → Paróquia Nossa Senhora de Fátima → casa, 5,3 km pela rota real. A outra viagem (Salvador ⇄ Fortaleza) continua disponível em **Viagens → Usar esta viagem**.
+
+- **Celular:** Viagens → **▶ Navegar no celular**. Usa o GPS; o botão **Simular** anda pela rota (1× ≈ 54 km/h, 5×, 20×).
+- **Android Auto:** "▶ Seguir viagem" abre o mesmo mapa na multimídia, com Simular, velocidade, Pular etapa e Etapas.
+- **Mapa offline:** `app/src/main/assets/mapa/` traz os tiles vetoriais do OpenStreetMap (OpenMapTiles via OpenFreeMap) de Salvador e Lauro de Freitas (zoom 0–14), fontes e ícones. Rotas e manobras vêm do OSRM e ficam em `dados/rotas/`.
+
 ## Estado atual (protótipo 0.1)
 
 Funciona:

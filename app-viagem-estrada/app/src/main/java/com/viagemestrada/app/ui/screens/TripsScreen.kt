@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -42,7 +43,7 @@ import com.viagemestrada.app.ui.VehicleArt.argb
 
 /** Viagens: a viagem atual com o atalho para continuar de onde parou. */
 @Composable
-fun TripsScreen(state: AppState, repository: TripRepository, onOpenRoute: () -> Unit) {
+fun TripsScreen(state: AppState, repository: TripRepository, onOpenRoute: () -> Unit, onNavigate: () -> Unit = {}) {
     val colors = LocalTripColors.current
     val trip = state.trip
     val nav = state.navigator
@@ -67,7 +68,7 @@ fun TripsScreen(state: AppState, repository: TripRepository, onOpenRoute: () -> 
         Card {
             Text(trip.name, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
             Text(
-                stringResource(R.string.trip_summary, trip.days.size, Format.distance(trip.totalKm, units)),
+                stringResource(R.string.trip_summary, pluralStringResource(R.plurals.days_count, trip.days.size, trip.days.size), Format.distance(trip.totalKm, units)),
                 color = colors.muted,
             )
             Spacer(Modifier.height(12.dp))
@@ -101,6 +102,33 @@ fun TripsScreen(state: AppState, repository: TripRepository, onOpenRoute: () -> 
                 ) { Text(stringResource(R.string.open_route), fontWeight = FontWeight.Bold) }
                 OutlinedButton(onClick = { confirmRestart = true }) {
                     Text(stringResource(R.string.restart_trip), color = MaterialTheme.colorScheme.onBackground)
+                }
+            }
+        }
+
+        Spacer(Modifier.height(10.dp))
+        Button(
+            onClick = onNavigate, enabled = !p.done,
+            modifier = Modifier.fillMaxWidth().height(52.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = colors.accent, contentColor = colors.onAccent),
+        ) { Text(stringResource(R.string.nav_phone), fontWeight = FontWeight.Bold, fontSize = 16.sp) }
+
+        SectionLabel(stringResource(R.string.trips_available))
+        repository.catalog.forEach { t ->
+            val active = t.id == state.trip.id
+            Card(Modifier.padding(bottom = 8.dp)) {
+                Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(t.name, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+                        Text(
+                            stringResource(R.string.trip_summary, pluralStringResource(R.plurals.days_count, t.days.size, t.days.size), Format.distance(t.totalKm, units)),
+                            color = colors.muted, fontSize = 13.sp,
+                        )
+                    }
+                    if (active) Text(stringResource(R.string.active_trip), color = colors.accent, fontWeight = FontWeight.Bold)
+                    else OutlinedButton(onClick = { repository.selectTrip(t.id) }) {
+                        Text(stringResource(R.string.use_trip), color = MaterialTheme.colorScheme.onBackground)
+                    }
                 }
             }
         }

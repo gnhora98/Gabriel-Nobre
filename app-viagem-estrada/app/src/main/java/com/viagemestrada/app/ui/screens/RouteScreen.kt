@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -78,7 +79,7 @@ fun RouteScreen(state: AppState, repository: TripRepository) {
         ScreenHeader(
             stringResource(R.string.tab_route),
             stringResource(
-                R.string.route_subtitle, trip.name, trip.days.size, Format.distance(trip.totalKm, units),
+                R.string.route_subtitle, trip.name, pluralStringResource(R.plurals.days_count, trip.days.size, trip.days.size), Format.distance(trip.totalKm, units),
             ),
         )
 

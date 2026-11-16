@@ -37,7 +37,7 @@ data class NavSnapshot(
     val rangeFraction: Float get() = if (rangeTotalKm <= 0) 0f else (rangeLeftKm / rangeTotalKm).toFloat().coerceIn(0f, 1f)
 
     companion object {
-        fun build(context: Context, s: AppState, position: LatLng?): NavSnapshot? {
+        fun build(context: Context, s: AppState, position: LatLng?, kmOnRoute: Double? = null): NavSnapshot? {
             val nav = s.navigator
             val p = s.progress
             val day = nav.day(p) ?: return null
@@ -49,7 +49,7 @@ data class NavSnapshot(
             val gpsKm = if (position != null && target.hasLocation) {
                 target.km - Geo.distanceKm(position, LatLng(target.lat!!, target.lng!!))
             } else null
-            val currentKm = (gpsKm ?: reached).coerceIn(reached, target.km)
+            val currentKm = (kmOnRoute ?: gpsKm ?: reached).coerceIn(reached, target.km)
 
             val rangeLeft = nav.remainingRangeKm(p, currentKm)
             val nextFuel = nav.nextFuelStop(p)

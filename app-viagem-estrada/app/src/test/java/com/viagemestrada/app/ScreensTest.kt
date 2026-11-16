@@ -44,8 +44,9 @@ class ScreensTest {
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val dir = File(System.getProperty("screens.dir") ?: "build/telas").apply { mkdirs() }
 
+    /** Capturas da viagem longa usam o Dia 4 (Fortaleza → Pipa), como no mockup. */
     private fun repository(stop: Int = 1): TripRepository =
-        TripRepository.get(context).apply { jumpTo(day = 3, stop = stop) }
+        TripRepository.get(context).apply { selectTrip("viagem-exemplo"); jumpTo(day = 3, stop = stop) }
 
     private fun capturePhone(tab: Tab, name: String) {
         val repo = repository()
@@ -56,6 +57,14 @@ class ScreensTest {
     }
 
     @Test fun celularViagens() = capturePhone(Tab.TRIPS, "celular-1-viagens.png")
+
+    /** Viagem de teste em Stella Maris: casa → colégio → Redemix → igreja → casa. */
+    @Test fun celularRoteiroTeste() {
+        val repo = TripRepository.get(context).apply { selectTrip("teste-stella-maris") }
+        compose.setContent { PhoneApp(repo, onLanguage = {}, initialTab = Tab.ROUTE) }
+        compose.waitForIdle()
+        compose.onRoot().captureRoboImage(File(dir, "celular-5-roteiro-teste.png").path)
+    }
     @Test fun celularRoteiro() = capturePhone(Tab.ROUTE, "celular-2-roteiro.png")
     @Test fun celularGaragem() = capturePhone(Tab.GARAGE, "celular-3-garagem.png")
     @Test fun celularAjustes() = capturePhone(Tab.SETTINGS, "celular-4-ajustes.png")

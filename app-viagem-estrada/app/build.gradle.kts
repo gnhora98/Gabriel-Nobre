@@ -13,8 +13,8 @@ android {
         applicationId = "com.viagemestrada.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 3
+        versionName = "0.3.0"
     }
 
     buildTypes {
@@ -39,6 +39,8 @@ android {
 
     androidResources {
         generateLocaleConfig = true
+        // Tiles do mapa já são compactados; não recompactar no APK.
+        noCompress += listOf("pbf")
     }
 
     // Testes de tela na JVM (Robolectric) geram as capturas em docs/telas/.
@@ -77,6 +79,9 @@ dependencies {
 
     // Android Auto (Car App Library), categoria NAVIGATION.
     implementation("androidx.car.app:app:1.7.0")
+
+    // Mapa vetorial offline (tiles do OpenStreetMap embutidos em assets/mapa).
+    implementation("org.maplibre.gl:android-sdk:11.13.5")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.robolectric:robolectric:4.16.1")

@@ -20,13 +20,13 @@
     <string name="restart_trip">Recomeçar viagem</string>
     <string name="restart_confirm">Voltar a viagem para o dia 1?</string>
     <string name="cancel">Cancelar</string>
-    <string name="trip_summary">%1$d dias · %2$s</string>
+    <string name="trip_summary">%1$s · %2$s</string>
     <string name="open_route">Abrir roteiro</string>
     <string name="android_auto">Android Auto</string>
     <string name="android_auto_hint">Conecte o celular na multimídia e abra o app: ele mostra o veículo e o botão Seguir viagem, continuando da etapa salva aqui.</string>
 
     <!-- Roteiro -->
-    <string name="route_subtitle">%1$s · %2$d dias · %3$s</string>
+    <string name="route_subtitle">%1$s · %2$s · %3$s</string>
     <string name="day_header">DIA %1$d · %2$s · %3$s → %4$s</string>
     <string name="day_times">Saída %1$s · chegada %2$s · %3$s</string>
     <string name="gap_warning">Trecho %1$s → %2$s (%3$s) passa da autonomia útil de %4$s. Adicione um posto.</string>
@@ -40,9 +40,9 @@
     <string name="edit">✎ Editar</string>
     <string name="advance">Avançar ▶</string>
     <string name="add_stop">+ Adicionar parada</string>
-    <string name="offline_maps">Mapas offline da viagem</string>
-    <string name="offline_maps_pending">próxima fase</string>
-    <string name="offline_data_ready">✓ Roteiro, postos e progresso já ficam salvos no aparelho</string>
+    <string name="offline_maps">Mapa offline (Salvador e região)</string>
+    <string name="offline_maps_pending">instalado</string>
+    <string name="offline_data_ready">✓ Mapa, rota, roteiro e progresso ficam no aparelho: funciona sem internet</string>
     <string name="set_current">Definir como etapa atual</string>
     <string name="new_stop_title">Nova parada</string>
     <string name="edit_stop_title">Editar parada</string>
@@ -106,10 +106,48 @@
     <string name="car_until">%1$s até %2$s</string>
     <string name="car_head_to">Siga para %1$s</string>
     <string name="car_skip">Pular etapa</string>
+    <string name="car_day_done">Dia concluído: chegamos em %1$s</string>
     <string name="car_arrived">Chegamos em %1$s</string>
     <string name="car_sunset_warning">Pôr do sol às %1$s. Faltam %2$s até %3$s.</string>
     <string name="car_no_location">Sem permissão de localização: abra o app no celular para liberar.</string>
     <string name="car_offline">Offline</string>
     <string name="car_online">Online</string>
     <string name="car_route_schematic">Mapa simplificado</string>
+
+    <!-- Navegação -->
+    <string name="i_turn">Vire %1$s</string>
+    <string name="i_cont">Continue %1$s</string>
+    <string name="i_merge">Entre %1$s</string>
+    <string name="i_onramp">Pegue o acesso %1$s</string>
+    <string name="i_offramp">Pegue a saída %1$s</string>
+    <string name="i_fork">Na bifurcação, mantenha-se %1$s</string>
+    <string name="i_end">No fim da via, vire %1$s</string>
+    <string name="i_round">Na rotatória, pegue a %1$dª saída</string>
+    <string name="i_arrive">Chegada ao destino</string>
+    <string name="i_uturn">Faça o retorno</string>
+    <string name="d_right">à direita</string>
+    <string name="d_left">à esquerda</string>
+    <string name="d_sright">levemente à direita</string>
+    <string name="d_sleft">levemente à esquerda</string>
+    <string name="d_shright">acentuadamente à direita</string>
+    <string name="d_shleft">acentuadamente à esquerda</string>
+    <string name="d_straight">em frente</string>
+    <string name="nav_phone">▶ Navegar no celular</string>
+    <string name="simulate">Simular</string>
+    <string name="pause">Pausar</string>
+    <string name="overview">Visão geral</string>
+    <string name="follow_map">Seguir</string>
+    <string name="close">Fechar</string>
+    <string name="speed_x">%1$d×</string>
+    <string name="active_trip">Em uso</string>
+    <string name="use_trip">Usar esta viagem</string>
+    <string name="trips_available">Viagens no aparelho</string>
+    <string name="off_route">Fora da rota (%1$s)</string>
+    <string name="gps_on">GPS</string>
+    <string name="sim_on">Simulação</string>
+    <string name="map_attrib">© OpenStreetMap</string>
+    <plurals name="days_count">
+        <item quantity="one">%d dia</item>
+        <item quantity="other">%d dias</item>
+    </plurals>
 </resources>

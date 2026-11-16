@@ -44,11 +44,16 @@ enum class Tab(@param:StringRes val label: Int, val icon: String) {
 fun PhoneApp(repository: TripRepository, onLanguage: (String) -> Unit, initialTab: Tab = Tab.TRIPS) {
     val state by repository.state.collectAsStateWithLifecycle()
     var tab by rememberSaveable { mutableStateOf(initialTab) }
+    var navigating by rememberSaveable { mutableStateOf(false) }
 
     ViagemTheme(
         effectiveTheme(state.settings),
         vehicleColor = state.garage.colorArgb.takeIf { state.settings.vehicleTheme },
     ) {
+        if (navigating) {
+            com.viagemestrada.app.ui.screens.PhoneNavScreen(state, repository, onClose = { navigating = false })
+            return@ViagemTheme
+        }
         Column(
             Modifier
                 .fillMaxSize()
@@ -58,7 +63,7 @@ fun PhoneApp(repository: TripRepository, onLanguage: (String) -> Unit, initialTa
         ) {
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 when (tab) {
-                    Tab.TRIPS -> TripsScreen(state, repository, onOpenRoute = { tab = Tab.ROUTE })
+                    Tab.TRIPS -> TripsScreen(state, repository, onOpenRoute = { tab = Tab.ROUTE }, onNavigate = { navigating = true })
                     Tab.ROUTE -> RouteScreen(state, repository)
                     Tab.GARAGE -> GarageScreen(state, repository)
                     Tab.SETTINGS -> SettingsScreen(state, repository, onLanguage)

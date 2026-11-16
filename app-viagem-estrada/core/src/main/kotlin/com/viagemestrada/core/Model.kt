@@ -7,6 +7,7 @@ import kotlinx.serialization.json.Json
 /** Viagem completa, no formato de `dados/viagem-exemplo.json`. */
 @Serializable
 data class Trip(
+    val id: String = "",
     @SerialName("nome") val name: String,
     @SerialName("veiculo") val vehicle: Vehicle,
     @SerialName("regras") val rules: Rules = Rules(),

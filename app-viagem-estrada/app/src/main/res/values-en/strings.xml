@@ -18,12 +18,12 @@
     <string name="restart_trip">Restart trip</string>
     <string name="restart_confirm">Reset the trip to day 1?</string>
     <string name="cancel">Cancel</string>
-    <string name="trip_summary">%1$d days · %2$s</string>
+    <string name="trip_summary">%1$s · %2$s</string>
     <string name="open_route">Open itinerary</string>
     <string name="android_auto">Android Auto</string>
     <string name="android_auto_hint">Connect your phone to the car display and open the app: it shows your vehicle and the Continue trip button, resuming from the stage saved here.</string>
 
-    <string name="route_subtitle">%1$s · %2$d days · %3$s</string>
+    <string name="route_subtitle">%1$s · %2$s · %3$s</string>
     <string name="day_header">DAY %1$d · %2$s · %3$s → %4$s</string>
     <string name="day_times">Departure %1$s · arrival %2$s · %3$s</string>
     <string name="gap_warning">Leg %1$s → %2$s (%3$s) exceeds the usable range of %4$s. Add a fuel stop.</string>
@@ -37,9 +37,9 @@
     <string name="edit">✎ Edit</string>
     <string name="advance">Next ▶</string>
     <string name="add_stop">+ Add stop</string>
-    <string name="offline_maps">Offline maps for this trip</string>
-    <string name="offline_maps_pending">next phase</string>
-    <string name="offline_data_ready">✓ Itinerary, fuel stops and progress are stored on the device</string>
+    <string name="offline_maps">Offline map (Salvador area)</string>
+    <string name="offline_maps_pending">installed</string>
+    <string name="offline_data_ready">✓ Map, route, itinerary and progress stay on the device: works without internet</string>
     <string name="set_current">Set as current stage</string>
     <string name="new_stop_title">New stop</string>
     <string name="edit_stop_title">Edit stop</string>
@@ -100,10 +100,48 @@
     <string name="car_until">%1$s to %2$s</string>
     <string name="car_head_to">Head to %1$s</string>
     <string name="car_skip">Skip stage</string>
+    <string name="car_day_done">Day complete: arrived at %1$s</string>
     <string name="car_arrived">Arrived at %1$s</string>
     <string name="car_sunset_warning">Sunset at %1$s. %2$s to go to %3$s.</string>
     <string name="car_no_location">No location permission: open the app on your phone to allow it.</string>
     <string name="car_offline">Offline</string>
     <string name="car_online">Online</string>
     <string name="car_route_schematic">Simplified map</string>
+
+    <!-- Navegação -->
+    <string name="i_turn">Turn %1$s</string>
+    <string name="i_cont">Continue %1$s</string>
+    <string name="i_merge">Merge %1$s</string>
+    <string name="i_onramp">Take the ramp %1$s</string>
+    <string name="i_offramp">Take the exit %1$s</string>
+    <string name="i_fork">At the fork, keep %1$s</string>
+    <string name="i_end">At the end of the road, turn %1$s</string>
+    <string name="i_round">At the roundabout, take exit %1$d</string>
+    <string name="i_arrive">You have arrived</string>
+    <string name="i_uturn">Make a U-turn</string>
+    <string name="d_right">right</string>
+    <string name="d_left">left</string>
+    <string name="d_sright">slightly right</string>
+    <string name="d_sleft">slightly left</string>
+    <string name="d_shright">sharp right</string>
+    <string name="d_shleft">sharp left</string>
+    <string name="d_straight">straight</string>
+    <string name="nav_phone">▶ Navigate on phone</string>
+    <string name="simulate">Simulate</string>
+    <string name="pause">Pause</string>
+    <string name="overview">Overview</string>
+    <string name="follow_map">Follow</string>
+    <string name="close">Close</string>
+    <string name="speed_x">%1$d×</string>
+    <string name="active_trip">Active</string>
+    <string name="use_trip">Use this trip</string>
+    <string name="trips_available">Trips on this device</string>
+    <string name="off_route">Off route (%1$s)</string>
+    <string name="gps_on">GPS</string>
+    <string name="sim_on">Simulation</string>
+    <string name="map_attrib">© OpenStreetMap</string>
+    <plurals name="days_count">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
 </resources>
