@@ -8,6 +8,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.ColorUtils
 import com.viagemestrada.app.data.Settings
 import com.viagemestrada.app.data.ThemeId
 import java.time.LocalTime
@@ -45,9 +47,29 @@ fun effectiveTheme(settings: Settings, now: LocalTime = LocalTime.now()): ThemeI
         if (now.hour in 6..17) ThemeId.LIGHT else ThemeId.DARK
     } else settings.theme
 
+/**
+ * Cor de destaque a partir da cor da moto: mantém o tom e ajusta a luminosidade
+ * para ficar legível no fundo. Cores neutras (preto/branco) viram prata/grafite.
+ */
+fun accentFromVehicle(argb: Long, lightBg: Boolean): Pair<Color, Color> {
+    val hsl = FloatArray(3)
+    ColorUtils.colorToHSL((argb and 0xFFFFFFFF).toInt(), hsl)
+    val (h, s, l) = Triple(hsl[0], hsl[1], hsl[2])
+    val accent = if (s < 0.14f) {
+        Color(if (lightBg) 0xFF4B5563 else if (l < 0.5f) 0xFFC9CFD8 else 0xFFEEF0F3)
+    } else {
+        val light = if (lightBg) 0.42f else (l + 0.14f).coerceIn(0.52f, 0.62f)
+        Color(ColorUtils.HSLToColor(floatArrayOf(h, maxOf(s, 0.62f), light)))
+    }
+    val onAccent = if (ColorUtils.calculateLuminance(accent.toArgb()) > 0.4) Color(0xFF14171C) else Color.White
+    return accent to onAccent
+}
+
 @Composable
-fun ViagemTheme(themeId: ThemeId, content: @Composable () -> Unit) {
-    val p = palette(themeId)
+fun ViagemTheme(themeId: ThemeId, vehicleColor: Long? = null, content: @Composable () -> Unit) {
+    val base = palette(themeId)
+    val p = if (vehicleColor == null) base else accentFromVehicle(vehicleColor, !base.dark)
+        .let { (a, on) -> base.copy(accent = a, onAccent = on) }
     val scheme = if (p.dark) {
         darkColorScheme(
             primary = p.accent, onPrimary = p.onAccent, background = p.bg, onBackground = p.text,

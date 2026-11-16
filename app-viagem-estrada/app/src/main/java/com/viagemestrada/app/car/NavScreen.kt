@@ -200,6 +200,7 @@ class NavScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleOb
         val container = surface ?: return
         val s = repository.current
         val snap = NavSnapshot.build(carContext, s, position)
+        renderer.routeColor = if (s.settings.vehicleTheme) WelcomeScreen.accentFor(s) else 0xFF2F8CFF.toInt()
         if (renderer.vehicleIcon == null || iconKey != s.garage.model to s.garage.colorArgb) {
             iconKey = s.garage.model to s.garage.colorArgb
             renderer.vehicleIcon = VehicleArt.bitmap(s.garage.model, s.garage.colorArgb.argb(), 160, 100)

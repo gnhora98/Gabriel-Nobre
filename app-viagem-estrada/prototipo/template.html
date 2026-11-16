@@ -2,10 +2,14 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Roboto:wght@400;500;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <style>
-/* Layout: bancada escura de oficina com os dois aparelhos lado a lado (celular | multimídia); no celular, um seletor alterna entre eles. */
+/* Layout: bancada escura com os dois aparelhos lado a lado (celular | multimídia); no celular, um seletor alterna entre eles.
+   A cor de destaque (--acc) vem da cor da moto escolhida na garagem. */
 :root{
-  --bench:#0b0e12; --bench-2:#151a21; --ink:#e8ecf1; --ink-dim:#97a1ad; --line:#26303b; --signal:#f5a524;
+  --bench:#0b0e12; --bench-2:#151a21; --ink:#e8ecf1; --ink-dim:#97a1ad; --line:#26303b;
+  --acc:#F5A524; --on-acc:#1A1300;
   --f-head:"Archivo","Roboto",system-ui,sans-serif; --f-ui:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;
   color-scheme:dark;
 }
@@ -13,27 +17,25 @@ html,body{background:var(--bench);color:var(--ink)}
 body{font-family:var(--f-ui);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
 *{box-sizing:border-box}
 button{font:inherit;color:inherit;cursor:pointer}
-button:focus-visible,input:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .wrap{max-width:1480px;margin:0 auto;display:grid;gap:18px}
 header.top{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px}
 header.top h1{font-family:var(--f-head);font-weight:800;font-size:clamp(24px,3vw,34px);margin:0;letter-spacing:-.01em;text-wrap:balance}
-header.top p{margin:4px 0 0;color:var(--ink-dim);max-width:62ch;line-height:1.45}
-.ver{font:500 12px var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--signal);border:1px solid #4a3a16;border-radius:999px;padding:5px 10px;white-space:nowrap}
+header.top p{margin:4px 0 0;color:var(--ink-dim);max-width:66ch;line-height:1.45}
+.ver{font:500 12px var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 40%,transparent);border-radius:999px;padding:5px 10px;white-space:nowrap}
 .switch{display:none;background:var(--bench-2);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
 .switch button{flex:1;border:0;background:transparent;border-radius:9px;padding:10px;font-weight:700;color:var(--ink-dim)}
-.switch button[aria-pressed="true"]{background:var(--signal);color:#1a1300}
+.switch button[aria-pressed="true"]{background:var(--acc);color:var(--on-acc)}
 .stage{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:28px;align-items:start}
 .dev-label{font:700 12px var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim);margin:0 0 10px;display:flex;justify-content:space-between;gap:8px}
 .dev-label span:last-child{letter-spacing:.02em;text-transform:none;font-weight:400}
 .col{min-width:0}
-
-/* ---------- Simulação ---------- */
 .sim{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;background:var(--bench-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
 .sim .lbl{font-size:13px;color:var(--ink-dim);margin-right:auto}
 .sim button{border:1px solid var(--line);background:#1d242d;border-radius:9px;padding:9px 14px;font-weight:700;font-size:14px}
-.sim button.go{background:var(--signal);border-color:var(--signal);color:#1a1300}
-.sim .clock{font:700 14px var(--f-ui);font-variant-numeric:tabular-nums;color:var(--ink)}
-.notes{margin-top:14px;color:var(--ink-dim);font-size:13px;line-height:1.55;max-width:70ch}
+.sim button.go{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.sim .clock{font:700 14px var(--f-ui);font-variant-numeric:tabular-nums}
+.notes{margin-top:14px;color:var(--ink-dim);font-size:13px;line-height:1.55;max-width:74ch}
 .notes b{color:var(--ink)}
 
 /* ---------- Celular ---------- */
@@ -45,6 +47,7 @@ header.top p{margin:4px 0 0;color:var(--ink-dim);max-width:62ch;line-height:1.45
 .app[data-t="light"]{--bg:#F6F7F9;--card:#FFFFFF;--text:#1F2328;--muted:#59636E;--accent:#E08A00;--on-accent:#fff}
 .app[data-t="desert"]{--bg:#1E140D;--card:#2E2016;--text:#F3E6D6;--muted:#B59C84;--accent:#E07A2E;--on-accent:#1E140D}
 .app[data-t="coast"]{--bg:#0B1E24;--card:#12303A;--text:#E2F3F5;--muted:#8FB5BC;--accent:#2EC4B6;--on-accent:#062026}
+.app[data-vt="1"]{--accent:var(--acc-app);--on-accent:var(--on-acc-app)}
 .statusbar{display:flex;justify-content:space-between;padding:12px 26px 4px;font-size:13px;font-weight:500;font-variant-numeric:tabular-nums}
 .scr{flex:1;overflow-y:auto;padding:8px 18px 18px;scrollbar-width:none}
 .scr::-webkit-scrollbar{display:none}
@@ -60,7 +63,7 @@ header.top p{margin:4px 0 0;color:var(--ink-dim);max-width:62ch;line-height:1.45
 .tabbar button{flex:1;border:0;background:none;display:grid;justify-items:center;gap:2px;font-size:11.5px;color:var(--muted);padding:4px 0}
 .tabbar button .ic{font-size:19px;line-height:1.2}
 .tabbar button[aria-current="page"]{color:var(--accent);font-weight:700}
-.veh{width:100%;height:auto;display:block}
+.veh{width:100%;height:auto;display:block;aspect-ratio:16/10;object-fit:contain}
 .trip-name{font-size:19px;font-weight:700}
 .eyebrow{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .big{font-size:18px;font-weight:700;margin:2px 0}
@@ -82,15 +85,22 @@ header.top p{margin:4px 0 0;color:var(--ink-dim);max-width:62ch;line-height:1.45
 .stop .grow{min-width:0;flex:1}
 .offline{display:flex;justify-content:space-between;gap:8px;font-size:14px}
 .okline{color:var(--done);font-size:12.5px;margin-top:4px}
-.viewer{background:var(--card);border-radius:16px;position:relative;touch-action:pan-y;cursor:grab;user-select:none}
-.viewer canvas{width:100%;height:auto;display:block}
-.viewer small{position:absolute;bottom:8px;left:0;right:0;text-align:center;color:var(--muted);font-size:11.5px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.viewer{background:radial-gradient(120% 90% at 50% 30%,color-mix(in srgb,var(--card) 70%,#fff 6%),var(--card));border-radius:16px;position:relative;touch-action:none;cursor:grab;user-select:none;overflow:hidden;min-height:160px}
+.viewer canvas.viewer3d{width:100%!important;height:auto!important;display:block}
+.viewer img{width:100%;display:block}
+.viewer small{position:absolute;bottom:8px;left:0;right:0;text-align:center;color:var(--muted);font-size:11.5px;pointer-events:none}
+.vtoggle{position:absolute;top:8px;right:8px;display:flex;background:color-mix(in srgb,var(--bg) 80%,transparent);border-radius:999px;padding:3px;z-index:2}
+.vtoggle button{border:0;background:none;border-radius:999px;padding:5px 11px;font-size:12px;color:var(--text)}
+.vtoggle button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);font-weight:700}
+.model-name{font-size:16px;font-weight:700;margin:12px 0 0}
+.model-sub{font-size:12.5px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .chip{border:0;border-radius:999px;padding:8px 13px;background:var(--card);color:var(--text);font-size:13.5px}
 .chip[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);font-weight:700}
-.swatches{display:flex;gap:11px;margin:4px 0 14px}
+.swatches{display:flex;flex-wrap:wrap;gap:11px;margin:4px 0 6px}
 .sw{width:32px;height:32px;border-radius:50%;border:1px solid color-mix(in srgb,var(--muted) 40%,transparent)}
-.sw[aria-pressed="true"]{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--accent)}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--text)}
+.swname{font-size:12.5px;color:var(--muted);margin:0 0 12px}
 .step{display:flex;align-items:center;background:var(--card);border-radius:10px;padding:4px 8px 4px 14px;margin:6px 0}
 .step span{flex:1;font-size:14.5px}
 .step b{color:var(--accent);min-width:74px;text-align:center;font-variant-numeric:tabular-nums}
@@ -101,7 +111,8 @@ header.top p{margin:4px 0 0;color:var(--ink-dim);max-width:62ch;line-height:1.45
 .themes{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
 .themes button{height:58px;border-radius:10px;border:2px solid transparent;text-align:left;padding:6px;display:flex;align-items:end;font-size:11.5px;font-weight:700;color:#fff}
 .themes button[aria-pressed="true"]{border-color:var(--accent)}
-.tg{display:flex;align-items:center;justify-content:space-between;background:var(--card);border-radius:10px;padding:12px 14px;margin:6px 0;width:100%;border:0;color:var(--text);font-size:14.5px;text-align:left}
+.tg{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border-radius:10px;padding:12px 14px;margin:6px 0;width:100%;border:0;color:var(--text);font-size:14.5px;text-align:left}
+.tg small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
 .tg i{width:42px;height:24px;border-radius:999px;background:color-mix(in srgb,var(--muted) 45%,transparent);position:relative;flex:none;transition:background .15s}
 .tg i::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .15s}
 .tg[aria-pressed="true"] i{background:var(--done)}
@@ -115,17 +126,24 @@ header.top p{margin:4px 0 0;color:var(--ink-dim);max-width:62ch;line-height:1.45
 
 /* ---------- Android Auto ---------- */
 .car{background:#000;border-radius:22px;padding:12px;box-shadow:0 0 0 2px #2a313a,0 30px 60px -20px #000}
-.aa{aspect-ratio:16/7;container-type:inline-size;display:grid;grid-template-columns:6.2% 1fr;border-radius:12px;overflow:hidden;background:#0f141a;font-family:var(--f-ui);color:#e6edf3}
+.aa{--signal:var(--acc);--on-signal:var(--on-acc);aspect-ratio:16/7;container-type:inline-size;display:grid;grid-template-columns:6.2% 1fr;border-radius:12px;overflow:hidden;background:#0f141a;font-family:var(--f-ui);color:#e6edf3}
 .rail{background:#05080b;display:flex;flex-direction:column;align-items:center;gap:1.4cqw;padding-top:1.2cqw;overflow:hidden;min-width:0}
 .rail .clk{font-size:1.05cqw;font-weight:500;color:#cfd6de;font-variant-numeric:tabular-nums;margin-bottom:.6cqw}
 .rail .ap{width:3.2cqw;height:3.2cqw;flex:none;border-radius:.8cqw;background:#28313b}
-.rail .ap.on{background:var(--signal)}
-.rail .ap.navapp{background:#2e6fd8}
+.rail .ap.navapp{background:var(--signal)}
 .main{position:relative;container-type:inline-size;overflow:hidden}
-.toast{position:absolute;left:50%;bottom:9cqw;transform:translateX(-50%);background:#e6edf3;color:#0d1117;padding:1.1cqw 2cqw;border-radius:1cqw;font-size:1.6cqw;font-weight:700;white-space:nowrap;z-index:3;box-shadow:0 .5cqw 2cqw rgba(0,0,0,.5)}
-/* boas-vindas (PaneTemplate) */
-.pane{position:absolute;inset:0;display:grid;grid-template-columns:44% 1fr;align-items:center;padding:3cqw 4cqw 3cqw 2cqw;gap:3cqw;background:radial-gradient(120% 120% at 20% 50%,#18212b 0%,#0d1117 60%)}
-.pane canvas{width:100%;height:auto}
+.mapwrap{position:absolute;inset:0;background:#1c232b}
+.mapwrap.maplibregl-map{position:absolute;overflow:hidden;-webkit-tap-highlight-color:transparent}
+.maplibregl-canvas-container,.maplibregl-canvas{position:absolute;left:0;top:0}
+.maplibregl-marker{position:absolute;top:0;left:0;will-change:transform}
+.veh-marker img{width:10cqw;height:10cqw;display:block;filter:drop-shadow(0 .4cqw .5cqw rgba(0,0,0,.55))}
+.stop-label{background:#161b22e6;color:#e6edf3;border-radius:.6cqw;padding:.35cqw .7cqw;font:500 1.05cqw var(--f-ui);white-space:nowrap;border:1px solid #2a333e}
+.stop-label.cur{background:var(--signal);color:var(--on-signal);border-color:transparent;font-weight:700}
+.carui{position:absolute;inset:0;pointer-events:none}
+.carui > *{pointer-events:auto}
+.toast{position:absolute;left:46%;bottom:9cqw;transform:translateX(-50%);background:#e6edf3;color:#0d1117;padding:1.1cqw 2cqw;border-radius:1cqw;font-size:1.6cqw;font-weight:700;white-space:nowrap;z-index:3;box-shadow:0 .5cqw 2cqw rgba(0,0,0,.5)}
+.pane{position:absolute;inset:0;display:grid;grid-template-columns:46% 1fr;align-items:center;padding:3cqw 4cqw 3cqw 1cqw;gap:2.5cqw;background:radial-gradient(110% 120% at 22% 55%,#202a35 0%,#0d1117 62%)}
+.pane img{width:100%;height:auto;display:block}
 .pane h2{font-size:3.4cqw;margin:0 0 .4cqw}
 .pane .s1{font-size:1.5cqw;color:#9aa4b0;margin:0 0 2cqw}
 .pane .box{background:#1a2129;border-radius:1.2cqw;padding:1.5cqw 1.8cqw;margin-bottom:2cqw}
@@ -133,27 +151,30 @@ header.top p{margin:4px 0 0;color:var(--ink-dim);max-width:62ch;line-height:1.45
 .pane .box .t{font-size:2.2cqw;font-weight:700;margin:.4cqw 0}
 .pane .box .d{font-size:1.45cqw;color:#c3cad3}
 .pane .acts{display:flex;gap:1.2cqw}
-.pane .acts button,.lt .hd button,.strip button{border:0;border-radius:1cqw;padding:1.3cqw 2.2cqw;font-weight:700;font-size:1.75cqw;background:#262e38;color:#fff}
-.pane .acts button.pri{background:var(--signal);color:#1a1300}
-/* navegação */
-.map{position:absolute;inset:0;width:100%;height:100%;display:block}
-.route-card{position:absolute;left:1.2cqw;top:1.2cqw;width:31cqw;background:#1b5e3a;border-radius:1.2cqw;padding:1.4cqw 1.8cqw;box-shadow:0 .4cqw 1.6cqw rgba(0,0,0,.4)}
-.route-card .dist{font-size:3.6cqw;font-weight:700;display:flex;align-items:center;gap:1cqw;font-variant-numeric:tabular-nums}
-.route-card .cue{font-size:1.55cqw;margin-top:.4cqw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.route-card .eta{font-size:1.3cqw;color:#bfe3cc;margin-top:.6cqw}
+.pane .acts button,.lt .hd button,.strip button,.mapbtns button{border:0;border-radius:1cqw;padding:1.3cqw 2.2cqw;font-weight:700;font-size:1.75cqw;background:#262e38;color:#fff}
+.pane .acts button.pri{background:var(--signal);color:var(--on-signal)}
+.route-card{position:absolute;left:1.2cqw;top:1.2cqw;width:31cqw;background:#1b5e3a;border-radius:1.2cqw;padding:1.3cqw 1.6cqw;box-shadow:0 .4cqw 1.6cqw rgba(0,0,0,.4);display:grid;grid-template-columns:auto 1fr;column-gap:1.4cqw;align-items:center}
+#n-arrow{grid-row:span 2;display:block;width:5.4cqw;height:5.4cqw}
+.route-card svg{width:100%;height:100%;display:block}
+.route-card .dist{font-size:3.4cqw;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.route-card .cue{font-size:1.5cqw;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.route-card .then{grid-column:1/-1;margin-top:.9cqw;padding-top:.8cqw;border-top:1px solid #ffffff2a;font-size:1.3cqw;color:#cfe9d9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .strip{position:absolute;right:1.2cqw;top:1.2cqw;display:flex;gap:.8cqw}
 .strip button{border-radius:5cqw;padding:1cqw 1.8cqw;font-size:1.55cqw;background:#262e38e6}
-.panel{position:absolute;right:1.2cqw;top:6.6cqw;bottom:1.2cqw;width:25.5cqw;display:grid;grid-template-rows:repeat(3,1fr);gap:.8cqw}
+.mapbtns{position:absolute;left:1.2cqw;bottom:6cqw;display:grid;gap:.8cqw}
+.mapbtns button{border-radius:50%;width:5cqw;height:5cqw;padding:0;font-size:1.25cqw;background:#262e38e6}
+.panel{position:absolute;right:1.2cqw;top:6.6cqw;bottom:1.2cqw;width:24cqw;display:grid;grid-template-rows:repeat(3,1fr);gap:.8cqw}
 .pc{background:#161b22f0;border-radius:1.2cqw;padding:1.2cqw 1.4cqw;min-height:0;overflow:hidden}
 .pc .e{font-size:1.05cqw;letter-spacing:.08em;text-transform:uppercase;color:#8b949e}
-.pc .t{font-size:1.75cqw;font-weight:700;margin:.4cqw 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc .t{font-size:1.7cqw;font-weight:700;margin:.4cqw 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pc .d{font-size:1.2cqw;color:#9aa4b0;line-height:1.35}
 .bar{height:.7cqw;border-radius:1cqw;background:#2b333d;margin:.6cqw 0 .7cqw;overflow:hidden}
-.bar i{display:block;height:100%;border-radius:1cqw;transition:width .2s}
-.nchips{position:absolute;left:34cqw;right:28cqw;bottom:1.2cqw;display:flex;gap:.8cqw;flex-wrap:wrap;justify-content:center}
+.bar i{display:block;height:100%;border-radius:1cqw}
+.nchips{position:absolute;left:8cqw;right:27cqw;bottom:1.2cqw;display:flex;gap:.8cqw;justify-content:center;flex-wrap:wrap}
 .nchips span{background:#161b22f0;border-radius:.9cqw;padding:.9cqw 1.3cqw;font-size:1.35cqw;font-weight:700;display:flex;align-items:center;gap:.6cqw;white-space:nowrap}
+.nchips .road{background:#e6edf3;color:#0d1117}
 .nchips .lv{width:.8cqw;height:.8cqw;border-radius:50%;background:#2ea043}
-/* etapas (ListTemplate) */
+.attr{position:absolute;right:26cqw;bottom:.2cqw;font-size:.8cqw;color:#8b949e99}
 .lt{position:absolute;inset:0;background:#0d1117;display:flex;flex-direction:column}
 .lt .hd{display:flex;align-items:center;gap:1.5cqw;padding:1.4cqw 2cqw;font-size:2.1cqw;font-weight:700}
 .lt .hd button{padding:.8cqw 1.6cqw}
@@ -162,6 +183,7 @@ header.top p{margin:4px 0 0;color:var(--ink-dim);max-width:62ch;line-height:1.45
 .lt li .a{font-size:1.75cqw}
 .lt li .b{font-size:1.3cqw;color:#9aa4b0}
 .lt li.cur button{outline:.25cqw solid var(--signal)}
+.nomap{position:absolute;inset:0;display:grid;place-items:center;color:#9aa4b0;font-size:1.6cqw;text-align:center;padding:4cqw}
 
 @media (max-width:900px){
   .switch{display:flex}
@@ -177,9 +199,9 @@ header.top p{margin:4px 0 0;color:var(--ink-dim);max-width:62ch;line-height:1.45
   <header class="top">
     <div>
       <h1>Viagem de Estrada</h1>
-      <p>Protótipo navegável do app 0.1, com a mesma lógica do APK: autonomia útil, postos, etapas, retomada e pôr do sol. O celular e o Android Auto compartilham o estado, então o que você muda num aparece no outro.</p>
+      <p>Protótipo navegável do app: o celular e o Android Auto compartilham o estado. A navegação usa as estradas reais do roteiro (OpenStreetMap) com a câmera seguindo a moto, e a cor da moto vira a cor do app.</p>
     </div>
-    <span class="ver">Protótipo 0.1 · simulação</span>
+    <span class="ver">Protótipo 0.2 · simulação</span>
   </header>
 
   <div class="switch" role="group" aria-label="Aparelho">
@@ -194,9 +216,9 @@ header.top p{margin:4px 0 0;color:var(--ink-dim);max-width:62ch;line-height:1.45
     </section>
     <section class="col col-car" aria-label="App no Android Auto">
       <p class="dev-label"><span>Android Auto</span><span>na estrada</span></p>
-      <div class="car"><div class="aa">
+      <div class="car"><div class="aa" id="aa">
         <div class="rail"><div class="clk" id="clk">05:00</div><div class="ap navapp"></div><div class="ap"></div><div class="ap"></div><div class="ap"></div></div>
-        <div class="main" id="car"></div>
+        <div class="main" id="carmain"><div class="mapwrap" id="mapwrap"></div><div class="carui" id="carui"></div></div>
       </div></div>
       <div class="sim">
         <span class="lbl">Simulação da estrada (fora do app):</span>
@@ -205,369 +227,16 @@ header.top p{margin:4px 0 0;color:var(--ink-dim);max-width:62ch;line-height:1.45
         <button type="button" data-act="speed" id="speedbtn">Velocidade 1×</button>
         <button type="button" data-act="reset">Recomeçar</button>
       </div>
-      <p class="notes"><b>Como usar:</b> toque em <b>▶ Seguir viagem</b> na multimídia e depois em <b>Simular direção</b>. A moto anda pela rota, a autonomia cai e, ao chegar em cada parada, o app avisa "Chegamos em…" e passa para a próxima etapa. No celular, mude a autonomia na Garagem, edite paradas no Roteiro ou troque o idioma nos Ajustes para ver o efeito no carro.<br><br><b>Ainda simplificado:</b> o fundo do mapa é esquemático e a rota liga as paradas em linha reta. O mapa offline do OpenStreetMap e a navegação curva a curva são a próxima fase.</p>
+      <p class="notes"><b>Como usar:</b> toque em <b>▶ Seguir viagem</b> na multimídia e depois em <b>Simular direção</b>. A câmera acompanha a moto pela estrada real e gira nas curvas; o cartão verde mostra a próxima manobra; ao chegar em cada parada o app avisa e passa para a próxima etapa. Os botões redondos alternam entre <b>visão geral</b> e <b>seguir</b>, e entre <b>3D</b> e <b>2D</b>. Na Garagem do celular, gire a moto em 3D e troque a cor: o tema do app e da multimídia muda junto.<br><br><b>Sobre os dados:</b> a rota e as manobras vêm do OpenStreetMap (via OSRM) e estão embutidas na página, como ficarão no app offline. Ainda faltam os detalhes do entorno (bairros, rios, nomes de ruas no mapa), que chegam com o pacote de mapa offline. O modelo 3D foi construído em código a partir das proporções da Meteor 650; um modelo oficial licenciado pode substituí-lo depois.</p>
     </section>
   </div>
 </div>
 
 <script type="application/json" id="trip">__TRIP_JSON__</script>
+<script type="application/json" id="routes">__ROUTES_JSON__</script>
 <script>
 "use strict";
-const TRIP = JSON.parse(document.getElementById("trip").textContent);
-
-/* ---------------- textos (PT / EN / ES) ---------------- */
-const STR = {
- pt:{trips:"Viagens",route:"Roteiro",garage:"Garagem",settings:"Ajustes",days:"dias",cont:"Continuar viagem · Dia {0} de {1}",next:"{0} · próxima parada: {1} ({2})",openRoute:"Abrir roteiro",restart:"Recomeçar viagem",restartQ:"Voltar a viagem para o dia 1?",cancel:"Cancelar",done:"Viagem concluída",aaTitle:"Android Auto",aaHint:"Conecte o celular na multimídia e abra o app: ele mostra o veículo e o botão Seguir viagem, continuando da etapa salva aqui.",day:"DIA",times:"Saída {0} · chegada {1} · {2}",gap:"Trecho {0} → {1} ({2}) passa da autonomia útil de {3}. Adicione um posto.",dep:"Saída {0}",fuel:"posto",yours:"sua parada",night:"pernoite",arrival:"chegada",current:"atual",back:"◀ Voltar",edit:"✎ Editar",adv:"Avançar ▶",add:"+ Adicionar parada",offMaps:"Mapas offline da viagem",nextPhase:"próxima fase",offOk:"✓ Roteiro, postos e progresso salvos no aparelho",setCur:"Definir como etapa atual",newStop:"Nova parada",editStop:"Editar parada",name:"Nome",time:"Horário (HH:MM)",km:"Km no dia",type:"Tipo",invalid:"Confira o nome, o horário (HH:MM) e o km.",save:"Salvar",del:"Excluir",tFuel:"Posto",tMeal:"Almoço + posto",tOpt:"Posto opcional",tNight:"Pernoite",tArr:"Chegada",tUser:"Parada",gSub:"Escolha o veículo da viagem",drag:"⟲ arraste para girar",range:"Autonomia",margin:"Margem de segurança",cons:"Consumo médio",usable:"Autonomia útil para sugerir postos: {0}",sSub:"Valem também para a multimídia",lang:"Idioma",theme:"Tema",dark:"Escuro",light:"Claro",desert:"Deserto",coast:"Litoral",nav:"Navegação",voice:"Avisos por voz",sunsetW:"Avisar antes do pôr do sol",dirt:"Evitar estradas de terra",auto:"Tema automático (dia/noite)",units:"Unidades",yourName:"Seu nome",gm:"Bom dia, {0}",ga:"Boa tarde, {0}",ge:"Boa noite, {0}",follow:"▶ Seguir viagem",stages:"Etapas",skip:"Pular etapa",autonomy:"Autonomia",left:"{0} restantes",nextFuel:"Próximo posto em {0} · {1}",ok:"margem ok",low:"autonomia baixa",noFuel:"Nenhum posto à frente hoje",nextStage:"Próxima etapa · {0}/{1}",arr:"Chegada {0}",dest:"Destino do dia",sunset:"pôr do sol {0}",until:"{0} até {1}",head:"Siga para {0}",arrived:"Chegamos em {0}",dayDone:"Dia concluído: chegamos em {0}",offline:"Offline",simple:"Mapa simplificado",ready:"offline pronto ✓",sunWarn:"Pôr do sol às {0}. Faltam {1} até {2}.",m:"Meteor 650",c:"Moto custom",tr:"Moto trail",h:"Hatch",se:"Sedã",su:"SUV",red:"vermelha",blk:"preta",wht:"branca",blu:"azul",grn:"verde",gld:"dourada"},
- en:{trips:"Trips",route:"Itinerary",garage:"Garage",settings:"Settings",days:"days",cont:"Continue trip · Day {0} of {1}",next:"{0} · next stop: {1} ({2})",openRoute:"Open itinerary",restart:"Restart trip",restartQ:"Reset the trip to day 1?",cancel:"Cancel",done:"Trip completed",aaTitle:"Android Auto",aaHint:"Connect your phone to the car display and open the app: it shows your vehicle and the Continue trip button, resuming from the stage saved here.",day:"DAY",times:"Departure {0} · arrival {1} · {2}",gap:"Leg {0} → {1} ({2}) exceeds the usable range of {3}. Add a fuel stop.",dep:"Depart {0}",fuel:"fuel",yours:"your stop",night:"overnight",arrival:"arrival",current:"current",back:"◀ Back",edit:"✎ Edit",adv:"Next ▶",add:"+ Add stop",offMaps:"Offline maps for this trip",nextPhase:"next phase",offOk:"✓ Itinerary, fuel stops and progress stored on the device",setCur:"Set as current stage",newStop:"New stop",editStop:"Edit stop",name:"Name",time:"Time (HH:MM)",km:"Km into the day",type:"Type",invalid:"Check the name, time (HH:MM) and km.",save:"Save",del:"Delete",tFuel:"Fuel",tMeal:"Lunch + fuel",tOpt:"Optional fuel",tNight:"Overnight",tArr:"Arrival",tUser:"Stop",gSub:"Choose the vehicle for this trip",drag:"⟲ drag to rotate",range:"Range",margin:"Safety margin",cons:"Average consumption",usable:"Usable range for fuel suggestions: {0}",sSub:"Also applied on the car display",lang:"Language",theme:"Theme",dark:"Dark",light:"Light",desert:"Desert",coast:"Coast",nav:"Navigation",voice:"Voice announcements",sunsetW:"Warn before sunset",dirt:"Avoid dirt roads",auto:"Automatic theme (day/night)",units:"Units",yourName:"Your name",gm:"Good morning, {0}",ga:"Good afternoon, {0}",ge:"Good evening, {0}",follow:"▶ Continue trip",stages:"Stages",skip:"Skip stage",autonomy:"Range",left:"{0} left",nextFuel:"Next fuel in {0} · {1}",ok:"margin ok",low:"low range",noFuel:"No fuel stops ahead today",nextStage:"Next stage · {0}/{1}",arr:"Arrive {0}",dest:"Destination today",sunset:"sunset {0}",until:"{0} to {1}",head:"Head to {0}",arrived:"Arrived at {0}",dayDone:"Day complete: arrived at {0}",offline:"Offline",simple:"Simplified map",ready:"offline ready ✓",sunWarn:"Sunset at {0}. {1} to go to {2}.",m:"Meteor 650",c:"Cruiser",tr:"Adventure bike",h:"Hatchback",se:"Sedan",su:"SUV",red:"red",blk:"black",wht:"white",blu:"blue",grn:"green",gld:"gold"},
- es:{trips:"Viajes",route:"Itinerario",garage:"Garaje",settings:"Ajustes",days:"días",cont:"Continuar viaje · Día {0} de {1}",next:"{0} · próxima parada: {1} ({2})",openRoute:"Abrir itinerario",restart:"Reiniciar viaje",restartQ:"¿Volver el viaje al día 1?",cancel:"Cancelar",done:"Viaje terminado",aaTitle:"Android Auto",aaHint:"Conecta el móvil a la pantalla del coche y abre la app: muestra el vehículo y el botón Seguir viaje, continuando desde la etapa guardada aquí.",day:"DÍA",times:"Salida {0} · llegada {1} · {2}",gap:"El tramo {0} → {1} ({2}) supera la autonomía útil de {3}. Agrega una gasolinera.",dep:"Salida {0}",fuel:"gasolinera",yours:"tu parada",night:"pernocta",arrival:"llegada",current:"actual",back:"◀ Volver",edit:"✎ Editar",adv:"Avanzar ▶",add:"+ Agregar parada",offMaps:"Mapas offline del viaje",nextPhase:"próxima fase",offOk:"✓ Itinerario, gasolineras y progreso guardados en el dispositivo",setCur:"Marcar como etapa actual",newStop:"Nueva parada",editStop:"Editar parada",name:"Nombre",time:"Hora (HH:MM)",km:"Km en el día",type:"Tipo",invalid:"Revisa el nombre, la hora (HH:MM) y el km.",save:"Guardar",del:"Eliminar",tFuel:"Gasolinera",tMeal:"Almuerzo + gasolinera",tOpt:"Gasolinera opcional",tNight:"Pernocta",tArr:"Llegada",tUser:"Parada",gSub:"Elige el vehículo del viaje",drag:"⟲ arrastra para girar",range:"Autonomía",margin:"Margen de seguridad",cons:"Consumo medio",usable:"Autonomía útil para sugerir gasolineras: {0}",sSub:"También se aplican en la pantalla del coche",lang:"Idioma",theme:"Tema",dark:"Oscuro",light:"Claro",desert:"Desierto",coast:"Litoral",nav:"Navegación",voice:"Avisos por voz",sunsetW:"Avisar antes del atardecer",dirt:"Evitar caminos de tierra",auto:"Tema automático (día/noche)",units:"Unidades",yourName:"Tu nombre",gm:"Buenos días, {0}",ga:"Buenas tardes, {0}",ge:"Buenas noches, {0}",follow:"▶ Seguir viaje",stages:"Etapas",skip:"Saltar etapa",autonomy:"Autonomía",left:"{0} restantes",nextFuel:"Próxima gasolinera en {0} · {1}",ok:"margen ok",low:"autonomía baja",noFuel:"No hay gasolineras adelante hoy",nextStage:"Próxima etapa · {0}/{1}",arr:"Llegada {0}",dest:"Destino del día",sunset:"atardecer {0}",until:"{0} hasta {1}",head:"Sigue hacia {0}",arrived:"Llegamos a {0}",dayDone:"Día terminado: llegamos a {0}",offline:"Offline",simple:"Mapa simplificado",ready:"offline listo ✓",sunWarn:"Atardecer a las {0}. Faltan {1} hasta {2}.",m:"Meteor 650",c:"Moto custom",tr:"Moto trail",h:"Hatchback",se:"Sedán",su:"SUV",red:"roja",blk:"negra",wht:"blanca",blu:"azul",grn:"verde",gld:"dorada"}
-};
-const t = (k, ...a) => (STR[S.set.lang][k] ?? STR.pt[k] ?? k).replace(/\{(\d)\}/g, (_, i) => a[i]);
-const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-
-/* ---------------- estado ---------------- */
-const MODELS = [["METEOR","m",1],["CUSTOM","c",1],["TRAIL","tr",1],["HATCH","h",0],["SEDAN","se",0],["SUV","su",0]];
-const COLORS = [["#B3261E","red"],["#1E2128","blk"],["#E8EAED","wht"],["#1F5FAD","blu"],["#3D5A3B","grn"],["#C9A227","gld"]];
-const CITY = {"Stella Maris":[-12.9406,-38.3364],"Maceió":[-9.6658,-35.7353],"Natal":[-5.7945,-35.211],"Fortaleza":[-3.7319,-38.5267],"Pipa":[-6.229,-35.047],"Porto de Galinhas":[-8.503,-35.005],"Aracaju":[-10.9472,-37.0731]};
-const S = {
-  trip: JSON.parse(JSON.stringify(TRIP)),
-  p: {d: 3, s: 0, done: false}, km: 0,
-  g: {model: "METEOR", color: "#B3261E", range: TRIP.veiculo.autonomia_km, margin: TRIP.veiculo.margem_seguranca_pct, kmpl: TRIP.veiculo.consumo_km_l || 21.5},
-  set: {lang: "pt", theme: "dark", voice: true, sunset: true, dirt: true, auto: false, units: "km", name: "Gabriel"},
-  tab: "trips", shownDay: 3, carScreen: "welcome", driving: false, speed: 1, rot: 0, modal: null, toast: null
-};
-
-/* ---------------- lógica (porta do módulo core) ---------------- */
-const kindOf = tp => ({abastecer:"FUEL",almoco_abastecer:"MEAL",abastecer_opcional:"OPT",pernoite:"NIGHT",chegada:"ARR",chegada_casa:"ARR"}[tp] || "USER");
-const isFuel = st => ["FUEL","MEAL","OPT"].includes(kindOf(st.tipo));
-const day = () => S.trip.dias[S.p.d];
-const target = () => S.p.done ? null : day()?.paradas[S.p.s] ?? null;
-const usable = () => S.g.range * (1 - S.g.margin / 100);
-function reachedKm(){ const d = day(); if (!d) return 0; if (S.p.done) return d.km; return S.p.s > 0 ? d.paradas[S.p.s-1].km : 0; }
-function lastFuelKm(){ const d = day(); if (!d) return 0; const r = S.p.done ? d.paradas : d.paradas.slice(0, S.p.s); const f = [...r].reverse().find(isFuel); return f ? f.km : 0; }
-const curKm = () => Math.max(S.km, reachedKm());
-const rangeLeft = () => Math.max(0, usable() - (curKm() - lastFuelKm()));
-const nextFuel = () => (!day() || S.p.done) ? null : day().paradas.slice(S.p.s).find(isFuel) ?? null;
-function gaps(d){ const m=[0,...d.paradas.filter(isFuel).map(x=>x.km),d.km]; const u=[...new Set(m)].sort((a,b)=>a-b); const g=[]; for(let i=1;i<u.length;i++) if(u[i]-u[i-1]>usable()) g.push([u[i-1],u[i]]); return g; }
-function advance(){
-  if (S.p.done) return;
-  const d = day();
-  if (S.p.s + 1 < d.paradas.length) S.p.s++;
-  else if (S.p.d + 1 < S.trip.dias.length) { S.p = {d: S.p.d + 1, s: 0, done: false}; }
-  else S.p.done = true;
-  S.km = reachedKm();
-}
-function back(){
-  if (S.p.done) S.p.done = false;
-  else if (S.p.s > 0) S.p.s--;
-  else if (S.p.d > 0) { S.p.d--; S.p.s = day().paradas.length - 1; }
-  S.km = reachedKm();
-}
-function jump(d, s){ S.p = {d, s, done: false}; S.km = reachedKm(); }
-const toMin = h => { const [a,b] = h.split(":").map(Number); return a*60+b; };
-const toHM = m => { m = ((Math.round(m) % 1440) + 1440) % 1440; return String(Math.floor(m/60)).padStart(2,"0") + ":" + String(m%60).padStart(2,"0"); };
-function sunsetMin(dateStr, lat, lng){
-  const dt = new Date(dateStr + "T12:00:00Z"); const start = Date.UTC(dt.getUTCFullYear(),0,1);
-  const n = Math.floor((dt - start) / 864e5) + 1; const g = 2*Math.PI/365*(n-1);
-  const eq = 229.18*(0.000075+0.001868*Math.cos(g)-0.032077*Math.sin(g)-0.014615*Math.cos(2*g)-0.040849*Math.sin(2*g));
-  const de = 0.006918-0.399912*Math.cos(g)+0.070257*Math.sin(g)-0.006758*Math.cos(2*g)+0.000907*Math.sin(2*g)-0.002697*Math.cos(3*g)+0.00148*Math.sin(3*g);
-  const la = lat*Math.PI/180; const c = Math.cos(90.833*Math.PI/180)/(Math.cos(la)*Math.cos(de)) - Math.tan(la)*Math.tan(de);
-  if (c < -1 || c > 1) return null;
-  const ha = Math.acos(c)*180/Math.PI; return 720 - 4*(lng - ha) - eq - 180;
-}
-const city = s => s.split(",")[0].trim();
-function posOf(st, d){ if (st.lat != null) return [st.lat, st.lng]; return CITY[city(st.nome)] || CITY[city(d.para)] || null; }
-function dayStart(i){ const d = S.trip.dias[i]; const prev = S.trip.dias[i-1]; if (prev){ const l = prev.paradas[prev.paradas.length-1]; const p = posOf(l, prev); if (p) return p; } return CITY[city(d.de)] || null; }
-function sunsetOf(d){ const l = [...d.paradas].reverse().map(x=>posOf(x,d)).find(Boolean); if (!l) return null; return toHM(sunsetMin(d.data, l[0], l[1])); }
-/* horário simulado: interpola os horários do roteiro pelo km */
-function clockAt(d, km){ const pts = [[0,toMin(d.saida)], ...d.paradas.map(x=>[x.km,toMin(x.hora)])]; for (let i=1;i<pts.length;i++){ if (km <= pts[i][0]) { const [k0,t0]=pts[i-1],[k1,t1]=pts[i]; return t0 + (t1-t0)*((km-k0)/Math.max(1,k1-k0)); } } return pts[pts.length-1][1]; }
-const dist = km => S.set.units === "km" ? Math.round(km).toLocaleString("pt-BR") + " km" : Math.round(km/1.609344).toLocaleString("pt-BR") + " mi";
-const cons = v => S.set.units === "km" ? v.toFixed(1).replace(".", ",") + " km/l" : (v*2.352).toFixed(1).replace(".", ",") + " mpg";
-const emoji = st => ({FUEL:"⛽",OPT:"⛽",MEAL:"🍽",NIGHT:"🛏",ARR:"🏁",USER:"📍"}[kindOf(st.tipo)]);
-const kindColor = k => ({FUEL:"var(--fuel)",OPT:"var(--fuel)",MEAL:"var(--user)",USER:"var(--user)",NIGHT:"var(--night)",ARR:"var(--night)"}[k]);
-const dayLabel = d => new Date(d.data+"T12:00:00").toLocaleDateString({pt:"pt-BR",en:"en-US",es:"es-ES"}[S.set.lang], {weekday:"short", day:"2-digit", month:"2-digit"}).replace(/\./g,"").replace(",","").toUpperCase();
-function appTheme(){ if (!S.set.auto) return S.set.theme; const h = Math.floor(clockAt(day() || S.trip.dias[0], curKm())/60); return h>=6 && h<18 ? "light" : "dark"; }
-
-/* ---------------- desenho do veículo (porta do VehicleArt) ---------------- */
-function drawVehicle(cv, model, color, rot = 0){
-  const c = cv.getContext("2d"), w = cv.width, h = cv.height; c.clearRect(0,0,w,h);
-  let sx = Math.cos(rot*Math.PI/180); if (Math.abs(sx) < .12) sx = .12*(sx<0?-1:1);
-  c.save(); c.translate(w/2,h/2); c.scale(sx,1); c.translate(-w/2,-h/2);
-  const F = (col)=>{c.fillStyle=col;}, circ=(x,y,r,col)=>{F(col);c.beginPath();c.arc(x,y,r,0,7);c.fill();};
-  const line=(x1,y1,x2,y2,col,lw)=>{c.strokeStyle=col;c.lineWidth=lw;c.lineCap="round";c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();};
-  const rr=(x1,y1,x2,y2,r,col)=>{F(col);c.beginPath();c.roundRect(x1,y1,x2-x1,y2-y1,r);c.fill();};
-  c.fillStyle="rgba(0,0,0,.33)"; c.beginPath(); c.ellipse(w/2,h*.89,w*.38,h*.05,0,0,7); c.fill();
-  const moto = MODELS.find(m=>m[0]===model)[2];
-  if (moto){
-    const trail = model==="TRAIL", r=h*(trail?.21:.19), wy=h*.86-r, rx=w*.25, fx=w*.75, sy=h*(trail?.38:.45);
-    for (const x of [rx,fx]){ circ(x,wy,r,"#2B313B"); circ(x,wy,r*.62,"#1A1F27"); c.strokeStyle="#8B95A5";c.lineWidth=h*.025;c.beginPath();c.arc(x,wy,r*.62,0,7);c.stroke(); circ(x,wy,r*.16,"#B8C0CC"); }
-    line(rx,wy,w*.47,sy+h*.08,"#9AA4B2",h*.035); line(w*.47,sy+h*.08,w*.52,wy-r*.2,"#9AA4B2",h*.035); line(fx,wy,w*.66,sy-h*.1,"#9AA4B2",h*.035);
-    rr(w*.42,sy+h*.1,w*.58,wy+r*.1,h*.03,"#4A5260"); rr(w*.22,sy-h*.03,w*.46,sy+h*.05,h*.04,"#2A1F1A");
-    F(color); c.beginPath(); c.moveTo(w*.44,sy+h*.04); c.quadraticCurveTo(w*.47,sy-h*.12,w*.6,sy-h*.09); c.quadraticCurveTo(w*.68,sy-h*.06,w*.64,sy+h*.05); c.closePath(); c.fill();
-    c.strokeStyle=color; c.lineWidth=h*.04; c.lineCap="round";
-    c.beginPath(); c.arc(fx,wy,r*1.1,200*Math.PI/180,310*Math.PI/180); c.stroke();
-    c.beginPath(); c.arc(rx,wy,r*1.1,220*Math.PI/180,320*Math.PI/180); c.stroke();
-    line(w*.66,sy-h*.1,w*.71,sy-h*.2,"#D0D6DE",h*.025); circ(w*.74,sy-h*.08,h*.045,"#F5EBC8");
-    if (!trail) rr(w*.08,sy-h*.1,w*.22,sy+h*.06,h*.02,"#2A303A");
-  } else {
-    const tall = model==="SUV"?.1:model==="HATCH"?.04:0, r=h*(model==="SUV"?.15:.13), wy=h*.86-r, bt=h*(.5-tall), rt=h*(.27-tall), re=model==="HATCH"?w*.12:w*.06, roofEnd=model==="SEDAN"?w*.6:w*.66;
-    F(color); c.beginPath(); c.moveTo(re,wy+r*.2); c.lineTo(re,bt+h*.04); c.quadraticCurveTo(re,bt,re+w*.05,bt); c.lineTo(w*.27,bt); c.lineTo(w*.36,rt); c.lineTo(roofEnd,rt); c.lineTo(w*.74,bt); c.lineTo(w*.9,bt+h*.04); c.quadraticCurveTo(w*.95,bt+h*.06,w*.95,bt+h*.14); c.lineTo(w*.95,wy+r*.2); c.closePath(); c.fill();
-    F("#1F2A36"); c.beginPath(); c.moveTo(w*.3,bt-h*.01); c.lineTo(w*.375,rt+h*.03); c.lineTo(w*.5,rt+h*.03); c.lineTo(w*.5,bt-h*.01); c.closePath(); c.fill();
-    c.beginPath(); c.moveTo(w*.52,bt-h*.01); c.lineTo(w*.52,rt+h*.03); c.lineTo(roofEnd-w*.01,rt+h*.03); c.lineTo(w*.71,bt-h*.01); c.closePath(); c.fill();
-    rr(w*.9,bt+h*.06,w*.95,bt+h*.1,6,"#F5EBC8"); rr(re,bt+h*.05,re+w*.025,bt+h*.1,6,"#D93A3A");
-    for (const x of [w*.24,w*.78]){ circ(x,wy,r*1.12,"#0F1318"); circ(x,wy,r,"#2B313B"); circ(x,wy,r*.55,"#8B95A5"); }
-  }
-  c.restore();
-}
-let iconCache = {k:"", url:""};
-function vehicleIcon(){ const k = S.g.model + S.g.color; if (iconCache.k !== k){ const cv = document.createElement("canvas"); cv.width=320; cv.height=200; drawVehicle(cv, S.g.model, S.g.color); iconCache = {k, url: cv.toDataURL()}; } return iconCache.url; }
-
-/* ---------------- celular ---------------- */
-const app = document.getElementById("app");
-function phoneHTML(){
-  const d = day(), tr = S.trip, sb = toHM(clockAt(d || tr.dias[0], curKm()));
-  let body = "";
-  if (S.tab === "trips"){
-    const tg = target();
-    body = `<p class="h1">${t("trips")}</p><canvas class="veh" id="vehA" width="720" height="380" aria-label="${esc(t(MODELS.find(m=>m[0]===S.g.model)[1]))}"></canvas>
-    <div class="card"><div class="trip-name">${esc(tr.nome)}</div><div class="muted" style="font-size:14px">${tr.dias.length} ${t("days")} · ${dist(tr.dias.reduce((a,x)=>a+x.km,0))}</div>
-    <div style="height:12px"></div>
-    ${S.p.done ? `<b style="color:var(--done)">${t("done")}</b>` : `<div class="eyebrow">${t("cont", S.p.d+1, tr.dias.length)}</div><div class="big">${esc(city(d.de))} → ${esc(city(d.para))}</div>
-      ${tg ? `<div class="muted" style="font-size:14px">${esc(t("next", dist(d.km), tg.nome, dist(Math.max(0, tg.km - curKm()))))}</div>` : ""}`}
-    <div class="row-btns"><button class="btn pri" data-act="tab" data-v="route">${t("openRoute")}</button><button class="btn ghost" data-act="askRestart">${t("restart")}</button></div></div>
-    <p class="sec">${t("aaTitle")}</p><div class="card muted" style="font-size:13.5px;line-height:1.5">${t("aaHint")}</div>`;
-  }
-  if (S.tab === "route"){
-    const i = S.shownDay, sd = tr.dias[i];
-    body = `<p class="h1">${t("route")}</p><p class="sub">${esc(tr.nome)} · ${tr.dias.length} ${t("days")} · ${dist(tr.dias.reduce((a,x)=>a+x.km,0))}</p>
-    <div class="dayhdr"><button data-act="day" data-v="-1" ${i===0?"disabled":""} aria-label="Dia anterior">◀</button><b>${t("day")} ${i+1} · ${dayLabel(sd)} · ${esc(city(sd.de))} → ${esc(city(sd.para))}</b><button data-act="day" data-v="1" ${i===tr.dias.length-1?"disabled":""} aria-label="Próximo dia">▶</button></div>
-    <p class="times">${t("times", sd.saida, sd.chegada, dist(sd.km))}</p>
-    ${gaps(sd).map(([a,b])=>`<div class="warn">⚠ ${t("gap", dist(a), dist(b), dist(b-a), dist(usable()))}</div>`).join("")}
-    <div class="tl"><div class="stop"><span class="dot" style="background:var(--done)"></span><span class="grow"><span class="nm">${t("dep", esc(city(sd.de)))}</span><br><span class="meta">${sd.saida}</span></span></div>
-    ${sd.paradas.map((st, j)=>{ const k = kindOf(st.tipo), cur = !S.p.done && S.p.d===i && S.p.s===j, reached = S.p.done || i<S.p.d || (i===S.p.d && j<S.p.s);
-      const lab = ["FUEL","OPT"].includes(k) ? t("fuel") : ["MEAL","USER"].includes(k) ? t("yours") : k==="NIGHT" ? t("night") : t("arrival");
-      return `<button class="stop" data-act="stopMenu" data-v="${j}"><span class="dot" style="background:${reached?"var(--done)":kindColor(k)}"></span><span class="grow"><span class="nm" style="${cur?"font-weight:700":""}">${emoji(st)} ${esc(st.nome)}</span><br><span class="meta">${lab} · ${dist(st.km)} · ${st.hora}</span></span>${cur?`<span class="tag">${t("current")}</span>`:reached?`<span class="tag ok">✓</span>`:`<span class="tag muted">⋮</span>`}</button>`; }).join("")}</div>
-    <div class="row-btns"><button class="btn" data-act="back">${t("back")}</button><button class="btn" data-act="editCur">${t("edit")}</button><button class="btn pri" data-act="adv">${t("adv")}</button></div>
-    <div class="row-btns" style="margin-top:8px"><button class="btn" data-act="addStop">${t("add")}</button></div>
-    <div class="card" style="margin-top:12px"><div class="offline"><span>${t("offMaps")}</span><span class="muted" style="font-size:13px">${t("nextPhase")}</span></div><div class="okline">${t("offOk")}</div></div>`;
-  }
-  if (S.tab === "garage"){
-    body = `<p class="h1">${t("garage")}</p><p class="sub">${t("gSub")}</p>
-    <div class="viewer" id="viewer"><canvas id="vehG" width="720" height="400"></canvas><small>${t("drag")}</small></div>
-    <div class="chips">${MODELS.map(([id,k])=>`<button class="chip" data-act="model" data-v="${id}" aria-pressed="${S.g.model===id}">${t(k)}</button>`).join("")}</div>
-    <div class="swatches">${COLORS.map(([c,k])=>`<button class="sw" style="background:${c}" data-act="color" data-v="${c}" aria-pressed="${S.g.color===c}" aria-label="${t(k)}"></button>`).join("")}</div>
-    <div class="step"><span>${t("range")}</span><button data-act="g" data-v="range,-10" aria-label="menos">−</button><b>${dist(S.g.range)}</b><button data-act="g" data-v="range,10" aria-label="mais">+</button></div>
-    <div class="step"><span>${t("margin")}</span><button data-act="g" data-v="margin,-5" aria-label="menos">−</button><b>${S.g.margin}%</b><button data-act="g" data-v="margin,5" aria-label="mais">+</button></div>
-    <div class="step"><span>${t("cons")}</span><button data-act="g" data-v="kmpl,-0.5" aria-label="menos">−</button><b>${cons(S.g.kmpl)}</b><button data-act="g" data-v="kmpl,0.5" aria-label="mais">+</button></div>
-    <p class="muted" style="font-size:13px">${t("usable", dist(usable()))}</p>`;
-  }
-  if (S.tab === "settings"){
-    const prev = {dark:["#0D1117","#F5A524"],light:["#F6F7F9","#E08A00"],desert:["#1E140D","#E07A2E"],coast:["#0B1E24","#2EC4B6"]};
-    const tg = (key, lab) => `<button class="tg" data-act="toggle" data-v="${key}" aria-pressed="${S.set[key]}"><span>${t(lab)}</span><i></i></button>`;
-    body = `<p class="h1">${t("settings")}</p><p class="sub">${t("sSub")}</p>
-    <p class="sec">${t("lang")}</p><div class="seg">${[["pt","Português"],["en","English"],["es","Español"]].map(([k,l])=>`<button data-act="lang" data-v="${k}" aria-pressed="${S.set.lang===k}">${l}</button>`).join("")}</div>
-    <p class="sec">${t("theme")}</p><div class="themes">${Object.entries(prev).map(([k,[a,b]])=>`<button data-act="theme" data-v="${k}" aria-pressed="${S.set.theme===k && !S.set.auto}" style="background:linear-gradient(135deg,${a},${b}a0);${k==="light"?"color:#1F2328":""}">${t(k)}</button>`).join("")}</div>
-    <p class="sec">${t("nav")}</p>${tg("voice","voice")}${tg("sunset","sunsetW")}${tg("dirt","dirt")}${tg("auto","auto")}
-    <p class="sec">${t("units")}</p><div class="seg"><button data-act="units" data-v="km" aria-pressed="${S.set.units==="km"}">km · L</button><button data-act="units" data-v="mi" aria-pressed="${S.set.units==="mi"}">mi · gal</button></div>
-    <p class="sec">${t("yourName")}</p><input class="field" id="name-input" value="${esc(S.set.name)}" autocomplete="off">`;
-  }
-  const tabs = [["trips","🧭"],["route","🗺"],["garage","🏍"],["settings","⚙"]];
-  return `<div class="statusbar"><span>${sb}</span><span>▮▮▮ 100%</span></div><div class="scr" id="scr">${body}</div>
-  <nav class="tabbar">${tabs.map(([k,ic])=>`<button data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}><span class="ic">${ic}</span>${t(k)}</button>`).join("")}</nav>${modalHTML()}`;
-}
-function modalHTML(){
-  const m = S.modal; if (!m) return "";
-  if (m.type === "restart") return `<div class="modal"><div class="sheet"><h3>${t("restartQ")}</h3><div class="row-btns"><button class="btn" data-act="close">${t("cancel")}</button><button class="btn pri" data-act="doRestart">${t("restart")}</button></div></div></div>`;
-  if (m.type === "menu"){ const st = S.trip.dias[S.shownDay].paradas[m.j]; return `<div class="modal" data-act="close"><div class="sheet"><h3>${emoji(st)} ${esc(st.nome)}</h3>${st.obs?`<p class="muted" style="margin:0">${esc(st.obs)}</p>`:""}<div class="row-btns"><button class="btn" data-act="editStop" data-v="${m.j}">${t("edit")}</button><button class="btn pri" data-act="setCur" data-v="${m.j}">${t("setCur")}</button></div></div></div>`; }
-  if (m.type === "edit"){
-    const st = m.j == null ? {nome:"",hora:"12:00",km:"",tipo:"parada"} : S.trip.dias[m.day].paradas[m.j];
-    const kinds = [["abastecer","tFuel"],["almoco_abastecer","tMeal"],["abastecer_opcional","tOpt"],["pernoite","tNight"],["chegada","tArr"],["parada","tUser"]];
-    const curT = m.tipo ?? (kindOf(st.tipo)==="USER" ? "parada" : st.tipo);
-    return `<div class="modal"><form class="sheet" id="stop-form"><h3>${t(m.j==null?"newStop":"editStop")}</h3>
-      <label>${t("name")}<input class="field" id="f-name" value="${esc(st.nome)}" required></label>
-      <label>${t("time")}<input class="field" id="f-time" value="${esc(st.hora)}" inputmode="numeric"></label>
-      <label>${t("km")}<input class="field" id="f-km" value="${esc(st.km)}" inputmode="decimal"></label>
-      <div><span class="muted" style="font-size:12px">${t("type")}</span><div class="chips" style="margin:6px 0 0">${kinds.map(([v,k])=>`<button type="button" class="chip" data-act="kind" data-v="${v}" aria-pressed="${curT===v}">${t(k)}</button>`).join("")}</div></div>
-      ${m.err?`<div class="err">${t("invalid")}</div>`:""}
-      <div class="row-btns">${m.j!=null?`<button type="button" class="btn" style="color:var(--warn)" data-act="delStop">${t("del")}</button>`:""}<button type="button" class="btn" data-act="close">${t("cancel")}</button><button type="submit" class="btn pri">${t("save")}</button></div></form></div>`;
-  }
-  return "";
-}
-function renderPhone(){
-  const scr = document.getElementById("scr"), top = scr ? scr.scrollTop : 0;
-  const focused = document.activeElement?.id;
-  app.dataset.t = appTheme();
-  app.innerHTML = phoneHTML();
-  const ns = document.getElementById("scr"); if (ns) ns.scrollTop = top;
-  const a = document.getElementById("vehA"); if (a) drawVehicle(a, S.g.model, S.g.color);
-  const g = document.getElementById("vehG"); if (g) drawVehicle(g, S.g.model, S.g.color, S.rot);
-  if (focused) document.getElementById(focused)?.focus();
-}
-
-/* ---------------- Android Auto ---------------- */
-const car = document.getElementById("car");
-function carHTML(){
-  const d = day();
-  if (S.carScreen === "stages" && d){
-    return `<div class="lt"><div class="hd"><button data-act="car" data-v="back" aria-label="Voltar">←</button>${esc(city(d.de))} → ${esc(city(d.para))}</div><ul>
-    ${d.paradas.map((st,j)=>{ const st8 = S.p.done||j<S.p.s ? "✓ " : j===S.p.s ? "▶ " : ""; return `<li class="${j===S.p.s&&!S.p.done?"cur":""}"><button data-act="carJump" data-v="${j}"><span class="a">${st8}${emoji(st)} ${esc(st.nome)}</span><span class="b">${st.hora} · ${dist(st.km)}</span></button></li>`; }).join("")}</ul></div>`;
-  }
-  if (S.carScreen === "nav" && d && !S.p.done) return navHTML();
-  const h = Math.floor(clockAt(d || S.trip.dias[0], curKm())/60);
-  const greet = t(h>=5&&h<12?"gm":h<18?"ga":"ge", esc(S.set.name));
-  const tg = target(), col = COLORS.find(c=>c[0]===S.g.color);
-  return `<div class="pane"><canvas id="vehC" width="900" height="520" aria-hidden="true"></canvas><div>
-    <h2>${greet}</h2><p class="s1">${esc(t(MODELS.find(m=>m[0]===S.g.model)[1]))} · ${t(col?col[1]:"red")} · ${t("ready")}</p>
-    ${S.p.done || !d ? `<div class="box"><div class="t">${t("done")}</div></div><div class="acts"><button class="pri" data-act="reset">${t("restart")}</button></div>` :
-    `<div class="box"><div class="e">${t("cont", S.p.d+1, S.trip.dias.length)}</div><div class="t">${esc(city(d.de))} → ${esc(city(d.para))}</div><div class="d">${esc(t("next", dist(d.km), tg.nome, dist(Math.max(0,tg.km-curKm()))))}</div></div>
-    <div class="acts"><button class="pri" data-act="car" data-v="nav">${t("follow")}</button><button data-act="car" data-v="stages">${t("stages")}</button></div>`}
-  </div></div>${toastHTML()}`;
-}
-function toastHTML(){ return S.toast ? `<div class="toast" role="status">${esc(S.toast)}</div>` : ""; }
-function navHTML(){
-  const d = day(), tg = target(), ck = curKm();
-  // pontos do dia (saída + paradas) com coordenadas
-  const pts = []; const st0 = dayStart(S.p.d); if (st0) pts.push({p:st0, k:"USER", reached:true, cur:false});
-  d.paradas.forEach((s,j)=>{ const p = posOf(s,d); if (p) pts.push({p, k:kindOf(s.tipo), reached:j<S.p.s, cur:j===S.p.s}); });
-  // veículo: interpolado entre a última parada alcançada e o alvo, pelo km
-  const fromStop = S.p.s>0 ? posOf(d.paradas[S.p.s-1], d) : st0, toStop = posOf(tg, d);
-  const fromKm = reachedKm(), f = Math.min(1, Math.max(0, (ck-fromKm)/Math.max(1, tg.km-fromKm)));
-  const veh = fromStop && toStop ? [fromStop[0]+(toStop[0]-fromStop[0])*f, fromStop[1]+(toStop[1]-fromStop[1])*f] : fromStop;
-  // projeção na área livre do mapa (entre o cartão de manobra e o painel)
-  const W = 1000, H = 437, box = {x0:360, x1:700, y0:90, y1:380};
-  const all = pts.map(x=>x.p); const lats = all.map(p=>p[0]), lngs = all.map(p=>p[1]);
-  const mnLa = Math.min(...lats), mxLa = Math.max(...lats), mnLo = Math.min(...lngs), mxLo = Math.max(...lngs);
-  const k = Math.cos((mnLa+mxLa)/2*Math.PI/180), sx = Math.max((mxLo-mnLo)*k, 1e-4), sy = Math.max(mxLa-mnLa, 1e-4);
-  const sc = Math.min((box.x1-box.x0)/sx, (box.y1-box.y0)/sy), ox = box.x0 + ((box.x1-box.x0) - sx*sc)/2, oy = box.y0 + ((box.y1-box.y0) - sy*sc)/2;
-  const P = p => [ox + (p[1]-mnLo)*k*sc, oy + (mxLa-p[0])*sc];
-  let last = 0; pts.forEach((x,i)=>{ if (x.reached) last = i; });
-  const path = arr => arr.map((x,i)=>(i?"L":"M")+P(x.p).map(v=>v.toFixed(1)).join(" ")).join(" ");
-  const roads = [...Array(9)].map((_,i)=>`<line x1="${-200+i*170}" y1="0" x2="${-60+i*170}" y2="${H}" />`).join("") + `<line x1="0" y1="${H*.66}" x2="${W}" y2="${H*.5}"/>`;
-  const dot = x => { const [cx,cy] = P(x.p); const col = x.reached ? "#2EA043" : (x.k==="NIGHT"||x.k==="ARR") ? "#A371F7" : ["FUEL","OPT","MEAL"].includes(x.k) ? "#F5A524" : "#3B8BEB"; const r = x.cur ? 9 : 6; return `<circle cx="${cx}" cy="${cy}" r="${r+2.5}" fill="#0D1117"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="${col}"/>`; };
-  const [vx,vy] = veh ? P(veh) : [0,0];
-  const svg = `<svg class="map" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="${W}" height="${H}" fill="#111820"/>
-    <g stroke="#1D2733" stroke-width="7" stroke-linecap="round">${roads}</g>
-    <path d="${path(pts.slice(0,last+1))}" fill="none" stroke="#5B6B7C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="${path(pts.slice(last))}" fill="none" stroke="#2F8CFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-    ${pts.map(dot).join("")}
-    ${veh ? `<circle cx="${vx}" cy="${vy}" r="18" fill="#1F5FAD" stroke="#fff" stroke-width="2.5"/><image href="${vehicleIcon()}" x="${vx-15}" y="${vy-10}" width="30" height="19"/>` : ""}</svg>`;
-  const left = rangeLeft(), frac = Math.min(1, left/usable()), barCol = frac>.5?"#2EA043":frac>.25?"#F5A524":"#E5534B";
-  const nf = nextFuel(); const nfTxt = nf ? t("nextFuel", dist(Math.max(0,nf.km-ck)), (nf.km-ck)<=left ? t("ok") : t("low")) : t("noFuel");
-  const dest = d.paradas[d.paradas.length-1], ss = sunsetOf(d);
-  const toGo = Math.max(0, tg.km-ck);
-  const distTxt = S.set.units==="km" && toGo < 1 ? Math.round(toGo*1000)+" m" : dist(toGo);
-  const eta = toHM(clockAt(d, tg.km));
-  return `${svg}
-  <div class="route-card"><div class="dist"><span aria-hidden="true">↑</span>${distTxt}</div><div class="cue">${esc(t("head", tg.nome))}</div><div class="eta">${t("arr", eta)}</div></div>
-  <div class="strip"><button data-act="skip">${t("skip")}</button><button data-act="car" data-v="stages">${t("stages")}</button></div>
-  <div class="panel">
-    <div class="pc"><div class="e">${t("autonomy")}</div><div class="t">${t("left", dist(left))}</div><div class="bar"><i style="width:${(frac*100).toFixed(1)}%;background:${barCol}"></i></div><div class="d">${esc(nfTxt)}</div></div>
-    <div class="pc"><div class="e">${t("nextStage", S.p.s+1, d.paradas.length)}</div><div class="t">${emoji(tg)} ${esc(tg.nome)}</div><div class="d">${t("arr", tg.hora)}</div></div>
-    <div class="pc"><div class="e">${t("dest")}</div><div class="t">${emoji(dest)} ${esc(dest.nome)}</div><div class="d">${t("arr", dest.hora)}${ss?" · "+t("sunset", ss):""}</div></div>
-  </div>
-  <div class="nchips"><span>${t("until", dist(d.km-ck), esc(city(d.para)))}</span><span><i class="lv"></i>${t("offline")}</span><span>${t("simple")}</span></div>
-  ${toastHTML()}`;
-}
-function renderCar(){
-  car.innerHTML = carHTML();
-  const c = document.getElementById("vehC"); if (c) drawVehicle(c, S.g.model, S.g.color);
-  const d = day() || S.trip.dias[S.trip.dias.length-1];
-  document.getElementById("clk").textContent = toHM(clockAt(d, curKm()));
-  document.getElementById("simkm").textContent = S.p.done ? t("done") : `${t("day")} ${S.p.d+1} · km ${Math.round(curKm())} / ${d.km}`;
-  document.getElementById("drivebtn").textContent = S.driving ? "⏸ Pausar" : "▶ Simular direção";
-}
-function renderAll(){ renderPhone(); renderCar(); }
-
-/* ---------------- avisos ---------------- */
-let toastTimer = null, sunsetWarned = -1;
-function toast(msg){ S.toast = msg; clearTimeout(toastTimer); toastTimer = setTimeout(()=>{ S.toast = null; renderCar(); }, 3200); speak(msg); }
-function speak(msg){ try { if (S.set.voice && window.speechSynthesis && voiceUnlocked){ const u = new SpeechSynthesisUtterance(msg); u.lang = {pt:"pt-BR",en:"en-US",es:"es-ES"}[S.set.lang]; speechSynthesis.cancel(); speechSynthesis.speak(u); } } catch(e){} }
-let voiceUnlocked = false;
-
-/* ---------------- simulação da estrada ---------------- */
-let timer = null;
-function tick(){
-  const tg = target(); if (!tg){ stopDrive(); return; }
-  const step = 1.2 * S.speed;
-  S.km = Math.min(tg.km, curKm() + step);
-  const d = day();
-  // aviso de pôr do sol: menos de 1 h antes, uma vez por dia
-  const ss = sunsetOf(d);
-  if (S.set.sunset && ss && sunsetWarned !== S.p.d){ const left = toMin(ss) - clockAt(d, S.km); if (left > 0 && left <= 60){ sunsetWarned = S.p.d; toast(t("sunWarn", ss, dist(d.km - S.km), city(d.para))); } }
-  if (S.km >= tg.km){
-    const lastOfDay = S.p.s === d.paradas.length - 1;
-    toast(lastOfDay ? t("dayDone", tg.nome) : t("arrived", tg.nome));
-    advance();
-    if (lastOfDay){ stopDrive(); S.carScreen = "welcome"; S.shownDay = S.p.d; }
-    renderAll(); return;
-  }
-  renderCar();
-}
-function startDrive(){ if (S.p.done) return; S.carScreen = "nav"; S.driving = true; timer = setInterval(tick, 90); renderCar(); }
-function stopDrive(){ S.driving = false; clearInterval(timer); timer = null; renderCar(); }
-
-/* ---------------- interação ---------------- */
-document.addEventListener("click", e => {
-  const el = e.target.closest("[data-act]"); if (!el) return;
-  if (el.classList.contains("modal") && e.target !== el) return; // clique dentro do sheet
-  voiceUnlocked = true;
-  const a = el.dataset.act, v = el.dataset.v;
-  switch (a){
-    case "show": document.getElementById("stage").dataset.show = v; document.querySelectorAll('[data-act="show"]').forEach(b=>b.setAttribute("aria-pressed", b.dataset.v===v)); return;
-    case "tab": S.tab = v; S.modal = null; if (v==="route") S.shownDay = Math.min(S.p.d, S.trip.dias.length-1); renderPhone(); document.getElementById("scr").scrollTop = 0; return;
-    case "day": S.shownDay += Number(v); break;
-    case "back": back(); S.shownDay = S.p.d; break;
-    case "adv": advance(); S.shownDay = Math.min(S.p.d, S.trip.dias.length-1); break;
-    case "askRestart": S.modal = {type:"restart"}; break;
-    case "doRestart": case "reset": stopDrive(); jump(0,0); S.shownDay = 0; S.modal = null; S.carScreen = "welcome"; sunsetWarned = -1; break;
-    case "close": S.modal = null; break;
-    case "stopMenu": S.modal = {type:"menu", j:Number(v)}; break;
-    case "setCur": jump(S.shownDay, Number(v)); S.modal = null; break;
-    case "editStop": S.modal = {type:"edit", day:S.shownDay, j:Number(v)}; break;
-    case "editCur": S.modal = {type:"edit", day:S.shownDay, j: S.p.d===S.shownDay ? Math.min(S.p.s, S.trip.dias[S.shownDay].paradas.length-1) : 0}; break;
-    case "addStop": S.modal = {type:"edit", day:S.shownDay, j:null}; break;
-    case "kind": { const f = readForm(); S.modal = {...S.modal, tipo:v, draft:f}; renderPhone(); fillForm(f); return; }
-    case "delStop": { const ps = S.trip.dias[S.modal.day].paradas; if (ps.length > 1){ ps.splice(S.modal.j,1); if (S.p.d===S.modal.day) S.p.s = Math.min(S.p.s, ps.length-1); S.km = reachedKm(); } S.modal = null; break; }
-    case "model": S.g.model = v; break;
-    case "color": S.g.color = v; break;
-    case "g": { const [key, dlt] = v.split(","); const lim = {range:[50,1500], margin:[0,60], kmpl:[3,60]}[key]; S.g[key] = Math.min(lim[1], Math.max(lim[0], +(S.g[key] + Number(dlt)).toFixed(1))); break; }
-    case "lang": S.set.lang = v; break;
-    case "theme": S.set.theme = v; S.set.auto = false; break;
-    case "toggle": S.set[v] = !S.set[v]; break;
-    case "units": S.set.units = v; break;
-    case "car":
-      if (v === "stages"){ S.prevNav = S.carScreen === "nav"; S.carScreen = "stages"; }
-      else if (v === "back") S.carScreen = S.prevNav ? "nav" : "welcome";
-      else S.carScreen = v;
-      renderCar(); return;
-    case "carJump": jump(S.p.d, Number(v)); S.carScreen = S.prevNav ? "nav" : "welcome"; S.shownDay = S.p.d; break;
-    case "skip": { const tg = target(); if (tg){ const lastOfDay = S.p.s === day().paradas.length-1; toast(lastOfDay ? t("dayDone", tg.nome) : t("arrived", tg.nome)); advance(); if (lastOfDay){ stopDrive(); S.carScreen = "welcome"; } S.shownDay = S.p.d; } break; }
-    case "drive": S.driving ? stopDrive() : startDrive(); return;
-    case "speed": S.speed = S.speed === 1 ? 4 : S.speed === 4 ? 10 : 1; el.textContent = `Velocidade ${S.speed}×`; return;
-  }
-  renderAll();
-});
-function readForm(){ const g = id => document.getElementById(id)?.value ?? ""; return {nome:g("f-name"), hora:g("f-time"), km:g("f-km")}; }
-function fillForm(f){ if (!f) return; const s = (id,v)=>{ const el = document.getElementById(id); if (el) el.value = v; }; s("f-name",f.nome); s("f-time",f.hora); s("f-km",f.km); }
-document.addEventListener("submit", e => {
-  if (e.target.id !== "stop-form") return; e.preventDefault();
-  const f = readForm(), km = parseFloat(String(f.km).replace(",", ".")), okT = /^([01]\d|2[0-3]):[0-5]\d$/.test(f.hora.trim());
-  if (!f.nome.trim() || isNaN(km) || km < 0 || !okT){ S.modal = {...S.modal, err:true}; renderPhone(); fillForm(f); return; }
-  const m = S.modal, ps = S.trip.dias[m.day].paradas;
-  const tipo = m.tipo ?? (m.j != null ? ps[m.j].tipo : "parada");
-  const st = {...(m.j != null ? ps[m.j] : {}), nome:f.nome.trim(), hora:f.hora.trim(), km, tipo};
-  if (m.j != null) ps[m.j] = st; else ps.push(st);
-  ps.sort((a,b)=>a.km-b.km);
-  if (S.p.d === m.day) S.p.s = Math.min(S.p.s, ps.length-1);
-  S.km = Math.max(S.km, reachedKm());
-  S.modal = null; renderAll();
-});
-document.addEventListener("input", e => { if (e.target.id === "name-input" && e.target.value.trim()){ S.set.name = e.target.value.trim(); renderCar(); } });
-/* girar o veículo na garagem */
-let dragX = null;
-document.addEventListener("pointerdown", e => { if (e.target.closest("#viewer")){ dragX = e.clientX; e.target.closest("#viewer").setPointerCapture?.(e.pointerId); } });
-document.addEventListener("pointermove", e => { if (dragX == null) return; S.rot = (S.rot + (e.clientX - dragX) * 1.2) % 360; dragX = e.clientX; const g = document.getElementById("vehG"); if (g) drawVehicle(g, S.g.model, S.g.color, S.rot); });
-document.addEventListener("pointerup", () => { dragX = null; });
-document.addEventListener("pointercancel", () => { dragX = null; });
-
-renderAll();
+/*__MOTO3D__*/
+/*__NAV__*/
+/*__APP__*/
 </script>

@@ -125,9 +125,16 @@ object VehicleArt {
         this.color = color; style = Paint.Style.STROKE; strokeWidth = width; strokeCap = Paint.Cap.ROUND
     }
 
-    /** Cores da garagem (mockup): vermelho, preto, branco, azul, verde, dourado. */
+    /** Cores inspiradas nas pinturas da linha Meteor 650. */
     val palette: List<Long> = listOf(
-        0xFFB3261E, 0xFF1E2128, 0xFFE8EAED, 0xFF1F5FAD, 0xFF3D5A3B, 0xFFC9A227,
+        0xFFA3211F, // Stellar Red
+        0xFFE2611B, // Fireball Orange
+        0xFFE3A81A, // Fireball Yellow
+        0xFF1F3F8F, // Stellar Blue
+        0xFF3E5B41, // Astral Green
+        0xFF5B3A29, // Supernova Brown
+        0xFF16181C, // Astral Black
+        0xFFE6E8EB, // Branco
     )
 
     fun Long.argb(): Int = (this and 0xFFFFFFFF).toInt()

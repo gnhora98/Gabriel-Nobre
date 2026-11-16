@@ -86,6 +86,8 @@
     <string name="voice">Avisos por voz</string>
     <string name="sunset_warning">Avisar antes do pôr do sol</string>
     <string name="avoid_dirt">Evitar estradas de terra</string>
+    <string name="vehicle_theme">Cores da moto no app</string>
+    <string name="vehicle_theme_hint">Botões, rota e destaques usam a cor escolhida na Garagem</string>
     <string name="auto_theme">Tema automático (dia/noite)</string>
     <string name="units">Unidades</string>
     <string name="rider_name">Seu nome</string>

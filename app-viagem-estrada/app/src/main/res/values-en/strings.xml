@@ -81,6 +81,8 @@
     <string name="voice">Voice announcements</string>
     <string name="sunset_warning">Warn before sunset</string>
     <string name="avoid_dirt">Avoid dirt roads</string>
+    <string name="vehicle_theme">Bike colors in the app</string>
+    <string name="vehicle_theme_hint">Buttons, route and highlights use the color chosen in the Garage</string>
     <string name="auto_theme">Automatic theme (day/night)</string>
     <string name="units">Units</string>
     <string name="rider_name">Your name</string>

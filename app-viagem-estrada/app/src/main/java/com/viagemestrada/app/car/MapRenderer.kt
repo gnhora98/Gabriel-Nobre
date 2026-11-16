@@ -25,6 +25,9 @@ class MapRenderer(private val density: Float) {
 
     var vehicleIcon: Bitmap? = null
 
+    /** Cor da rota à frente (cor da moto quando o tema da moto está ativo). */
+    var routeColor: Int = 0xFF2F8CFF.toInt()
+
     private fun dp(v: Float) = v * density
 
     fun draw(c: Canvas, width: Int, height: Int, visible: Rect, snap: NavSnapshot?, dark: Boolean, offline: Boolean, offlineLabel: String, routeLabel: String) {
@@ -80,7 +83,7 @@ class MapRenderer(private val density: Float) {
             if (i >= lastReached) { if (i == lastReached) ahead.moveTo(x, y) else ahead.lineTo(x, y) }
         }
         c.drawPath(done, stroke(0xFF5B6B7C.toInt(), dp(8f)))
-        c.drawPath(ahead, stroke(0xFF2F8CFF.toInt(), dp(10f)))
+        c.drawPath(ahead, stroke(routeColor, dp(10f)))
 
         pts.forEach { mp ->
             val (x, y) = project(mp.pos)

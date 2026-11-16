@@ -45,7 +45,10 @@ fun PhoneApp(repository: TripRepository, onLanguage: (String) -> Unit, initialTa
     val state by repository.state.collectAsStateWithLifecycle()
     var tab by rememberSaveable { mutableStateOf(initialTab) }
 
-    ViagemTheme(effectiveTheme(state.settings)) {
+    ViagemTheme(
+        effectiveTheme(state.settings),
+        vehicleColor = state.garage.colorArgb.takeIf { state.settings.vehicleTheme },
+    ) {
         Column(
             Modifier
                 .fillMaxSize()

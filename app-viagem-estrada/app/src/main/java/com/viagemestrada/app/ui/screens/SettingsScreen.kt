@@ -64,6 +64,8 @@ fun SettingsScreen(state: AppState, repository: TripRepository, onLanguage: (Str
         Segmented(listOf("pt" to "Português", "en" to "English", "es" to "Español"), s.language, onLanguage)
 
         SectionLabel(stringResource(R.string.theme))
+        Toggle(stringResource(R.string.vehicle_theme), s.vehicleTheme) { v -> set { it.copy(vehicleTheme = v) } }
+        Text(stringResource(R.string.vehicle_theme_hint), color = LocalTripColors.current.muted, fontSize = 12.sp, modifier = Modifier.padding(bottom = 8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             ThemeId.entries.forEach { id ->
                 ThemeTile(id, selected = s.theme == id && !s.autoTheme, Modifier.weight(1f)) {

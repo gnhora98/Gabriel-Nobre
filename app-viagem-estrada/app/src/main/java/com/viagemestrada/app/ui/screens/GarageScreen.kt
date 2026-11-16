@@ -100,12 +100,12 @@ fun GarageScreen(state: AppState, repository: TripRepository) {
             }
         }
 
-        Row(Modifier.padding(vertical = 16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(Modifier.padding(vertical = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             VehicleArt.palette.forEach { c ->
                 val selected = c == garage.colorArgb
                 Box(
                     Modifier
-                        .size(34.dp)
+                        .size(30.dp)
                         .clip(CircleShape)
                         .background(Color(c.argb()))
                         .border(if (selected) 3.dp else 1.dp, if (selected) colors.accent else colors.muted.copy(alpha = 0.4f), CircleShape)

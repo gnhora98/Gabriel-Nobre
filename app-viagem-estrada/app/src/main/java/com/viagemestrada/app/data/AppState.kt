@@ -16,7 +16,7 @@ enum class Units { KM, MI }
 @Serializable
 data class Garage(
     val model: VehicleModel = VehicleModel.METEOR,
-    val colorArgb: Long = 0xFFB3261E,
+    val colorArgb: Long = 0xFFA3211F,
     val rangeKm: Double = 200.0,
     val marginPct: Double = 30.0,
     val kmPerLiter: Double = 21.5,
@@ -28,6 +28,8 @@ data class Garage(
 data class Settings(
     val language: String = "pt",
     val theme: ThemeId = ThemeId.DARK,
+    /** Usa a cor da moto como cor de destaque do app (celular e Android Auto). */
+    val vehicleTheme: Boolean = true,
     val voice: Boolean = true,
     val sunsetWarning: Boolean = true,
     val avoidDirt: Boolean = true,

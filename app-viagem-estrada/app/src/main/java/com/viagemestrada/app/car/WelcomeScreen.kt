@@ -9,6 +9,7 @@ import androidx.car.app.model.Pane
 import androidx.car.app.model.PaneTemplate
 import androidx.car.app.model.Row
 import androidx.car.app.model.Template
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.lifecycleScope
 import com.viagemestrada.app.R
@@ -72,7 +73,7 @@ class WelcomeScreen(carContext: CarContext) : Screen(carContext) {
             }
             val follow = Action.Builder()
                 .setTitle(carContext.getString(R.string.follow_trip))
-                .setBackgroundColor(CarColor.createCustom(ACCENT, ACCENT))
+                .setBackgroundColor(accentFor(s).let { CarColor.createCustom(it, it) })
                 .setOnClickListener { screenManager.push(NavScreen(carContext)) }
             if (carContext.carAppApiLevel >= 4) follow.setFlags(Action.FLAG_PRIMARY)
             pane.addAction(follow.build())
@@ -98,5 +99,11 @@ class WelcomeScreen(carContext: CarContext) : Screen(carContext) {
 
     companion object {
         const val ACCENT = 0xFFF5A524.toInt()
+
+        /** Destaque do Android Auto: cor da moto (se ativado nos Ajustes) ou laranja padrão. */
+        fun accentFor(s: com.viagemestrada.app.data.AppState): Int =
+            if (s.settings.vehicleTheme) {
+                com.viagemestrada.app.ui.accentFromVehicle(s.garage.colorArgb, lightBg = false).first.toArgb()
+            } else ACCENT
     }
 }
