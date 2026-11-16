@@ -48,11 +48,13 @@ const Nav = (() => {
 
   function available() { return !!window.maplibregl && (() => { try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); } catch (e) { return false; } })(); }
 
-  function init(container) {
+  let basemap = false;
+  function init(container, baseStyle) {
     if (map || !available()) return !!map;
+    basemap = !!baseStyle;
     map = new maplibregl.Map({
       container, interactive: false, attributionControl: false, fadeDuration: 0, pitch: 60, zoom: 15, center: [-38.5, -3.7],
-      style: {
+      style: baseStyle || {
         version: 8, sources: {},
         layers: [{ id: "bg", type: "background", paint: { "background-color": "#1c232b" } }],
       },
@@ -62,11 +64,17 @@ const Nav = (() => {
       map.addSource("stubs", { type: "geojson", data: empty() });
       map.addSource("route", { type: "geojson", data: empty(), lineMetrics: true });
       map.addSource("stops", { type: "geojson", data: empty() });
+      if (basemap) {
+        // Mapa real por baixo: só a rota (com borda) por cima das ruas.
+        map.addLayer({ id: "road-casing", type: "line", source: "route", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#0d1117", "line-width": W(3, 46) } });
+        map.addLayer({ id: "route", type: "line", source: "route", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-width": W(2, 30), "line-gradient": grad(0) } });
+      } else {
       map.addLayer({ id: "stubs-casing", type: "line", source: "stubs", layout: { "line-cap": "round" }, paint: { "line-color": "#151a20", "line-width": W(1.5, 80) } });
       map.addLayer({ id: "stubs", type: "line", source: "stubs", layout: { "line-cap": "round" }, paint: { "line-color": "#353f4b", "line-width": W(1, 64) } });
       map.addLayer({ id: "road-casing", type: "line", source: "route", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#11161b", "line-width": W(4, 150) } });
       map.addLayer({ id: "road", type: "line", source: "route", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#46515f", "line-width": W(3, 128) } });
       map.addLayer({ id: "route", type: "line", source: "route", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-width": W(2, 64), "line-gradient": grad(0) } });
+      }
       map.addLayer({
         id: "stops", type: "circle", source: "stops",
         paint: {
@@ -104,8 +112,8 @@ const Nav = (() => {
     const r = route;
     map.getSource("route").setData({ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: r.line } });
     const stubs = [];
-    for (const s of r.stubs) { const p = [s[0], s[1]]; for (let i = 2; i < s.length; i++) stubs.push([p, dest(p, s[i], 170)]); }
-    map.getSource("stubs").setData({ type: "Feature", properties: {}, geometry: { type: "MultiLineString", coordinates: stubs } });
+    for (const s of (r.stubs || [])) { const p = [s[0], s[1]]; for (let i = 2; i < s.length; i++) stubs.push([p, dest(p, s[i], 170)]); }
+    if (map.getSource("stubs")) map.getSource("stubs").setData({ type: "Feature", properties: {}, geometry: { type: "MultiLineString", coordinates: stubs } });
     updateStops(routeData.stops);
   }
   /** Paradas: círculos coloridos no mapa + etiquetas com o nome das próximas. */
@@ -139,7 +147,7 @@ const Nav = (() => {
     marker.setLngLat(p);
     if (ready) map.setPaintProperty("route", "line-gradient", grad(s / route.total));
     if (follow) {
-      const z = speedFactor >= 20 ? 14.6 : speedFactor >= 5 ? 15.5 : 16.2;
+      const z = speedFactor >= 100 ? 14.6 : speedFactor >= 20 ? 15.4 : speedFactor >= 5 ? 16.2 : 17;
       camZoom += (z - camZoom) * 0.08;
       map.jumpTo({ center: p, bearing: heading, pitch: tilt ? 62 : 0, zoom: camZoom });
       marker.setRotationAlignment("viewport"); marker.setRotation(0);

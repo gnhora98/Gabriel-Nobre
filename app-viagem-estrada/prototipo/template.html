@@ -199,9 +199,9 @@ header.top p{margin:4px 0 0;color:var(--ink-dim);max-width:66ch;line-height:1.45
   <header class="top">
     <div>
       <h1>Viagem de Estrada</h1>
-      <p>Protótipo navegável do app: o celular e o Android Auto compartilham o estado. A navegação usa as estradas reais do roteiro (OpenStreetMap) com a câmera seguindo a moto, e a cor da moto vira a cor do app.</p>
+      <p>Protótipo navegável do app 0.3: viagem de teste em Stella Maris (casa → Colégio Marízia Maior → Redemix → Paróquia N. Sra. de Fátima → casa) com o mapa offline de Salvador. O celular e o Android Auto compartilham o estado.</p>
     </div>
-    <span class="ver">Protótipo 0.2 · simulação</span>
+    <span class="ver">Protótipo 0.3 · simulação</span>
   </header>
 
   <div class="switch" role="group" aria-label="Aparelho">
@@ -227,12 +227,13 @@ header.top p{margin:4px 0 0;color:var(--ink-dim);max-width:66ch;line-height:1.45
         <button type="button" data-act="speed" id="speedbtn">Velocidade 1×</button>
         <button type="button" data-act="reset">Recomeçar</button>
       </div>
-      <p class="notes"><b>Como usar:</b> toque em <b>▶ Seguir viagem</b> na multimídia e depois em <b>Simular direção</b>. A câmera acompanha a moto pela estrada real e gira nas curvas; o cartão verde mostra a próxima manobra; ao chegar em cada parada o app avisa e passa para a próxima etapa. Os botões redondos alternam entre <b>visão geral</b> e <b>seguir</b>, e entre <b>3D</b> e <b>2D</b>. Na Garagem do celular, gire a moto em 3D e troque a cor: o tema do app e da multimídia muda junto.<br><br><b>Sobre os dados:</b> a rota e as manobras vêm do OpenStreetMap (via OSRM) e estão embutidas na página, como ficarão no app offline. Ainda faltam os detalhes do entorno (bairros, rios, nomes de ruas no mapa), que chegam com o pacote de mapa offline. O modelo 3D foi construído em código a partir das proporções da Meteor 650; um modelo oficial licenciado pode substituí-lo depois.</p>
+      <p class="notes"><b>Como usar:</b> toque em <b>▶ Seguir viagem</b> na multimídia e depois em <b>Simular direção</b>. A câmera acompanha a moto pelas ruas reais de Stella Maris e gira nas curvas; o cartão verde mostra a próxima manobra; ao chegar em cada parada o app avisa e passa para a próxima. Velocidade 1× ≈ 54 km/h; use 5×, 20× ou 100× para ir mais rápido. Os botões redondos alternam entre <b>visão geral</b> e <b>seguir</b>, e entre <b>3D</b> e <b>2D</b>. A viagem Salvador ⇄ Fortaleza continua em <b>Viagens</b> no celular.<br><br><b>Sobre o mapa:</b> é o mesmo mapa offline do APK (OpenStreetMap de Salvador e Lauro de Freitas, carregado de um arquivo junto da página, sem servidor de mapas). Fora dessa área o fundo fica sem ruas. A rota e as manobras vêm do OSRM.</p>
     </section>
   </div>
 </div>
 
-<script type="application/json" id="trip">__TRIP_JSON__</script>
+<script type="application/json" id="trips">__TRIPS_JSON__</script>
+<script type="application/json" id="mapstyle">__STYLE_JSON__</script>
 <script type="application/json" id="routes">__ROUTES_JSON__</script>
 <script>
 "use strict";

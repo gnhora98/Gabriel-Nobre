@@ -2,18 +2,20 @@
  * App: estado compartilhado (celular + Android Auto), telas,
  * tema pela cor da moto e simulação da estrada.
  * ============================================================ */
-const TRIP = JSON.parse(document.getElementById("trip").textContent);
+// Viagens no aparelho (a primeira é a de teste em Stella Maris) e rotas reais por viagem/dia.
+const TRIPS = JSON.parse(document.getElementById("trips").textContent);
 const ROUTES = JSON.parse(document.getElementById("routes").textContent);
+const TRIP = TRIPS[0];
 
 /* ---------------- textos (PT / EN / ES) ---------------- */
 const STR = {
- pt:{trips:"Viagens",route:"Roteiro",garage:"Garagem",settings:"Ajustes",days:"dias",cont:"Continuar viagem · Dia {0} de {1}",next:"{0} · próxima parada: {1} ({2})",openRoute:"Abrir roteiro",restart:"Recomeçar viagem",restartQ:"Voltar a viagem para o dia 1?",cancel:"Cancelar",done:"Viagem concluída",aaTitle:"Android Auto",aaHint:"Conecte o celular na multimídia e abra o app: ele mostra a sua moto e o botão Seguir viagem, continuando da etapa salva aqui.",day:"DIA",times:"Saída {0} · chegada {1} · {2}",gap:"Trecho {0} → {1} ({2}) passa da autonomia útil de {3}. Adicione um posto.",dep:"Saída {0}",fuel:"posto",yours:"sua parada",night:"pernoite",arrival:"chegada",current:"atual",back:"◀ Voltar",edit:"✎ Editar",adv:"Avançar ▶",add:"+ Adicionar parada",offMaps:"Rota da viagem (OpenStreetMap)",offReady:"baixada",offOk:"✓ Roteiro, rota, postos e progresso salvos no aparelho",setCur:"Definir como etapa atual",newStop:"Nova parada",editStop:"Editar parada",name:"Nome",time:"Horário (HH:MM)",km:"Km no dia",type:"Tipo",invalid:"Confira o nome, o horário (HH:MM) e o km.",save:"Salvar",del:"Excluir",tFuel:"Posto",tMeal:"Almoço + posto",tOpt:"Posto opcional",tNight:"Pernoite",tArr:"Chegada",tUser:"Parada",gSub:"Escolha o veículo da viagem",drag:"⟲ arraste para girar 360°",v3d:"3D",vPhoto:"Foto",range:"Autonomia",margin:"Margem de segurança",cons:"Consumo médio",usable:"Autonomia útil para sugerir postos: {0}",sSub:"Valem também para a multimídia",lang:"Idioma",theme:"Fundo",dark:"Escuro",light:"Claro",desert:"Deserto",coast:"Litoral",vt:"Cores da moto no app",vtSub:"Botões, rota e destaques usam a cor escolhida na Garagem",nav:"Navegação",voice:"Avisos por voz",sunsetW:"Avisar antes do pôr do sol",dirt:"Evitar estradas de terra",auto:"Fundo automático (dia/noite)",units:"Unidades",yourName:"Seu nome",gm:"Bom dia, {0}",ga:"Boa tarde, {0}",ge:"Boa noite, {0}",follow:"▶ Seguir viagem",stages:"Etapas",skip:"Pular etapa",autonomy:"Autonomia",left:"{0} restantes",nextFuel:"Próximo posto em {0} · {1}",ok:"margem ok",low:"autonomia baixa",noFuel:"Nenhum posto à frente hoje",nextStage:"Próxima etapa · {0}/{1}",arr:"Chegada {0}",dest:"Destino do dia",sunset:"pôr do sol {0}",eta:"{0} · {1} até {2}",arrived:"Chegamos em {0}",dayDone:"Dia concluído: chegamos em {0}",offline:"Offline",ready:"offline pronto ✓",sunWarn:"Pôr do sol às {0}. Faltam {1} até {2}.",then:"Depois: {0}",overview:"Visão geral",followBtn:"Seguir",mapNo:"Este navegador não conseguiu abrir o mapa 3D (WebGL indisponível).",
+ pt:{tripsAvail:"Viagens no aparelho",inUse:"Em uso",useTrip:"Usar esta viagem",day1:"dia",trips:"Viagens",route:"Roteiro",garage:"Garagem",settings:"Ajustes",days:"dias",cont:"Continuar viagem · Dia {0} de {1}",next:"{0} · próxima parada: {1} ({2})",openRoute:"Abrir roteiro",restart:"Recomeçar viagem",restartQ:"Voltar a viagem para o dia 1?",cancel:"Cancelar",done:"Viagem concluída",aaTitle:"Android Auto",aaHint:"Conecte o celular na multimídia e abra o app: ele mostra a sua moto e o botão Seguir viagem, continuando da etapa salva aqui.",day:"DIA",times:"Saída {0} · chegada {1} · {2}",gap:"Trecho {0} → {1} ({2}) passa da autonomia útil de {3}. Adicione um posto.",dep:"Saída {0}",fuel:"posto",yours:"sua parada",night:"pernoite",arrival:"chegada",current:"atual",back:"◀ Voltar",edit:"✎ Editar",adv:"Avançar ▶",add:"+ Adicionar parada",offMaps:"Rota da viagem (OpenStreetMap)",offReady:"baixada",offOk:"✓ Roteiro, rota, postos e progresso salvos no aparelho",setCur:"Definir como etapa atual",newStop:"Nova parada",editStop:"Editar parada",name:"Nome",time:"Horário (HH:MM)",km:"Km no dia",type:"Tipo",invalid:"Confira o nome, o horário (HH:MM) e o km.",save:"Salvar",del:"Excluir",tFuel:"Posto",tMeal:"Almoço + posto",tOpt:"Posto opcional",tNight:"Pernoite",tArr:"Chegada",tUser:"Parada",gSub:"Escolha o veículo da viagem",drag:"⟲ arraste para girar 360°",v3d:"3D",vPhoto:"Foto",range:"Autonomia",margin:"Margem de segurança",cons:"Consumo médio",usable:"Autonomia útil para sugerir postos: {0}",sSub:"Valem também para a multimídia",lang:"Idioma",theme:"Fundo",dark:"Escuro",light:"Claro",desert:"Deserto",coast:"Litoral",vt:"Cores da moto no app",vtSub:"Botões, rota e destaques usam a cor escolhida na Garagem",nav:"Navegação",voice:"Avisos por voz",sunsetW:"Avisar antes do pôr do sol",dirt:"Evitar estradas de terra",auto:"Fundo automático (dia/noite)",units:"Unidades",yourName:"Seu nome",gm:"Bom dia, {0}",ga:"Boa tarde, {0}",ge:"Boa noite, {0}",follow:"▶ Seguir viagem",stages:"Etapas",skip:"Pular etapa",autonomy:"Autonomia",left:"{0} restantes",nextFuel:"Próximo posto em {0} · {1}",ok:"margem ok",low:"autonomia baixa",noFuel:"Nenhum posto à frente hoje",nextStage:"Próxima etapa · {0}/{1}",arr:"Chegada {0}",dest:"Destino do dia",sunset:"pôr do sol {0}",eta:"{0} · {1} até {2}",arrived:"Chegamos em {0}",dayDone:"Dia concluído: chegamos em {0}",offline:"Offline",ready:"offline pronto ✓",sunWarn:"Pôr do sol às {0}. Faltam {1} até {2}.",then:"Depois: {0}",overview:"Visão geral",followBtn:"Seguir",mapNo:"Este navegador não conseguiu abrir o mapa 3D (WebGL indisponível).",
    m:"Meteor 650",c:"Moto custom",tr:"Moto trail",h:"Hatch",se:"Sedã",su:"SUV",mSub:"Royal Enfield · 648 cc bicilíndrica · cruiser",cSub:"Modelo genérico de cruiser",trSub:"Modelo genérico de trail",carSub:"Modelo genérico de carro",
    i_dep:"Siga",i_turn:"Vire {0}",i_cont:"Continue {0}",i_merge:"Entre {0}",i_onramp:"Pegue o acesso {0}",i_offramp:"Pegue a saída {0}",i_fork:"Na bifurcação, mantenha-se {0}",i_end:"No fim da via, vire {0}",i_round:"Na rotatória, pegue a {0}ª saída",i_arrive:"Chegada ao destino",i_uturn:"Faça o retorno",d_right:"à direita",d_left:"à esquerda",d_sright:"levemente à direita",d_sleft:"levemente à esquerda",d_shright:"acentuadamente à direita",d_shleft:"acentuadamente à esquerda",d_straight:"em frente",on:"{0} · {1}",to:"{0} · {1}"},
- en:{trips:"Trips",route:"Itinerary",garage:"Garage",settings:"Settings",days:"days",cont:"Continue trip · Day {0} of {1}",next:"{0} · next stop: {1} ({2})",openRoute:"Open itinerary",restart:"Restart trip",restartQ:"Reset the trip to day 1?",cancel:"Cancel",done:"Trip completed",aaTitle:"Android Auto",aaHint:"Connect your phone to the car display and open the app: it shows your bike and the Continue trip button, resuming from the stage saved here.",day:"DAY",times:"Departure {0} · arrival {1} · {2}",gap:"Leg {0} → {1} ({2}) exceeds the usable range of {3}. Add a fuel stop.",dep:"Depart {0}",fuel:"fuel",yours:"your stop",night:"overnight",arrival:"arrival",current:"current",back:"◀ Back",edit:"✎ Edit",adv:"Next ▶",add:"+ Add stop",offMaps:"Trip route (OpenStreetMap)",offReady:"downloaded",offOk:"✓ Itinerary, route, fuel stops and progress stored on the device",setCur:"Set as current stage",newStop:"New stop",editStop:"Edit stop",name:"Name",time:"Time (HH:MM)",km:"Km into the day",type:"Type",invalid:"Check the name, time (HH:MM) and km.",save:"Save",del:"Delete",tFuel:"Fuel",tMeal:"Lunch + fuel",tOpt:"Optional fuel",tNight:"Overnight",tArr:"Arrival",tUser:"Stop",gSub:"Choose the vehicle for this trip",drag:"⟲ drag to rotate 360°",v3d:"3D",vPhoto:"Photo",range:"Range",margin:"Safety margin",cons:"Average consumption",usable:"Usable range for fuel suggestions: {0}",sSub:"Also applied on the car display",lang:"Language",theme:"Background",dark:"Dark",light:"Light",desert:"Desert",coast:"Coast",vt:"Bike colors in the app",vtSub:"Buttons, route and highlights use the color chosen in the Garage",nav:"Navigation",voice:"Voice announcements",sunsetW:"Warn before sunset",dirt:"Avoid dirt roads",auto:"Automatic background (day/night)",units:"Units",yourName:"Your name",gm:"Good morning, {0}",ga:"Good afternoon, {0}",ge:"Good evening, {0}",follow:"▶ Continue trip",stages:"Stages",skip:"Skip stage",autonomy:"Range",left:"{0} left",nextFuel:"Next fuel in {0} · {1}",ok:"margin ok",low:"low range",noFuel:"No fuel stops ahead today",nextStage:"Next stage · {0}/{1}",arr:"Arrive {0}",dest:"Destination today",sunset:"sunset {0}",eta:"{0} · {1} to {2}",arrived:"Arrived at {0}",dayDone:"Day complete: arrived at {0}",offline:"Offline",ready:"offline ready ✓",sunWarn:"Sunset at {0}. {1} to go to {2}.",then:"Then: {0}",overview:"Overview",followBtn:"Follow",mapNo:"This browser could not open the 3D map (WebGL unavailable).",
+ en:{tripsAvail:"Trips on this device",inUse:"Active",useTrip:"Use this trip",day1:"day",trips:"Trips",route:"Itinerary",garage:"Garage",settings:"Settings",days:"days",cont:"Continue trip · Day {0} of {1}",next:"{0} · next stop: {1} ({2})",openRoute:"Open itinerary",restart:"Restart trip",restartQ:"Reset the trip to day 1?",cancel:"Cancel",done:"Trip completed",aaTitle:"Android Auto",aaHint:"Connect your phone to the car display and open the app: it shows your bike and the Continue trip button, resuming from the stage saved here.",day:"DAY",times:"Departure {0} · arrival {1} · {2}",gap:"Leg {0} → {1} ({2}) exceeds the usable range of {3}. Add a fuel stop.",dep:"Depart {0}",fuel:"fuel",yours:"your stop",night:"overnight",arrival:"arrival",current:"current",back:"◀ Back",edit:"✎ Edit",adv:"Next ▶",add:"+ Add stop",offMaps:"Trip route (OpenStreetMap)",offReady:"downloaded",offOk:"✓ Itinerary, route, fuel stops and progress stored on the device",setCur:"Set as current stage",newStop:"New stop",editStop:"Edit stop",name:"Name",time:"Time (HH:MM)",km:"Km into the day",type:"Type",invalid:"Check the name, time (HH:MM) and km.",save:"Save",del:"Delete",tFuel:"Fuel",tMeal:"Lunch + fuel",tOpt:"Optional fuel",tNight:"Overnight",tArr:"Arrival",tUser:"Stop",gSub:"Choose the vehicle for this trip",drag:"⟲ drag to rotate 360°",v3d:"3D",vPhoto:"Photo",range:"Range",margin:"Safety margin",cons:"Average consumption",usable:"Usable range for fuel suggestions: {0}",sSub:"Also applied on the car display",lang:"Language",theme:"Background",dark:"Dark",light:"Light",desert:"Desert",coast:"Coast",vt:"Bike colors in the app",vtSub:"Buttons, route and highlights use the color chosen in the Garage",nav:"Navigation",voice:"Voice announcements",sunsetW:"Warn before sunset",dirt:"Avoid dirt roads",auto:"Automatic background (day/night)",units:"Units",yourName:"Your name",gm:"Good morning, {0}",ga:"Good afternoon, {0}",ge:"Good evening, {0}",follow:"▶ Continue trip",stages:"Stages",skip:"Skip stage",autonomy:"Range",left:"{0} left",nextFuel:"Next fuel in {0} · {1}",ok:"margin ok",low:"low range",noFuel:"No fuel stops ahead today",nextStage:"Next stage · {0}/{1}",arr:"Arrive {0}",dest:"Destination today",sunset:"sunset {0}",eta:"{0} · {1} to {2}",arrived:"Arrived at {0}",dayDone:"Day complete: arrived at {0}",offline:"Offline",ready:"offline ready ✓",sunWarn:"Sunset at {0}. {1} to go to {2}.",then:"Then: {0}",overview:"Overview",followBtn:"Follow",mapNo:"This browser could not open the 3D map (WebGL unavailable).",
    m:"Meteor 650",c:"Cruiser",tr:"Adventure bike",h:"Hatchback",se:"Sedan",su:"SUV",mSub:"Royal Enfield · 648 cc parallel twin · cruiser",cSub:"Generic cruiser model",trSub:"Generic adventure model",carSub:"Generic car model",
    i_dep:"Head",i_turn:"Turn {0}",i_cont:"Continue {0}",i_merge:"Merge {0}",i_onramp:"Take the ramp {0}",i_offramp:"Take the exit {0}",i_fork:"At the fork, keep {0}",i_end:"At the end of the road, turn {0}",i_round:"At the roundabout, take exit {0}",i_arrive:"You have arrived",i_uturn:"Make a U-turn",d_right:"right",d_left:"left",d_sright:"slightly right",d_sleft:"slightly left",d_shright:"sharp right",d_shleft:"sharp left",d_straight:"straight",on:"{0} onto {1}",to:"{0} toward {1}"},
- es:{trips:"Viajes",route:"Itinerario",garage:"Garaje",settings:"Ajustes",days:"días",cont:"Continuar viaje · Día {0} de {1}",next:"{0} · próxima parada: {1} ({2})",openRoute:"Abrir itinerario",restart:"Reiniciar viaje",restartQ:"¿Volver el viaje al día 1?",cancel:"Cancelar",done:"Viaje terminado",aaTitle:"Android Auto",aaHint:"Conecta el móvil a la pantalla del coche y abre la app: muestra tu moto y el botón Seguir viaje, continuando desde la etapa guardada aquí.",day:"DÍA",times:"Salida {0} · llegada {1} · {2}",gap:"El tramo {0} → {1} ({2}) supera la autonomía útil de {3}. Agrega una gasolinera.",dep:"Salida {0}",fuel:"gasolinera",yours:"tu parada",night:"pernocta",arrival:"llegada",current:"actual",back:"◀ Volver",edit:"✎ Editar",adv:"Avanzar ▶",add:"+ Agregar parada",offMaps:"Ruta del viaje (OpenStreetMap)",offReady:"descargada",offOk:"✓ Itinerario, ruta, gasolineras y progreso guardados en el dispositivo",setCur:"Marcar como etapa actual",newStop:"Nueva parada",editStop:"Editar parada",name:"Nombre",time:"Hora (HH:MM)",km:"Km en el día",type:"Tipo",invalid:"Revisa el nombre, la hora (HH:MM) y el km.",save:"Guardar",del:"Eliminar",tFuel:"Gasolinera",tMeal:"Almuerzo + gasolinera",tOpt:"Gasolinera opcional",tNight:"Pernocta",tArr:"Llegada",tUser:"Parada",gSub:"Elige el vehículo del viaje",drag:"⟲ arrastra para girar 360°",v3d:"3D",vPhoto:"Foto",range:"Autonomía",margin:"Margen de seguridad",cons:"Consumo medio",usable:"Autonomía útil para sugerir gasolineras: {0}",sSub:"También se aplican en la pantalla del coche",lang:"Idioma",theme:"Fondo",dark:"Oscuro",light:"Claro",desert:"Desierto",coast:"Litoral",vt:"Colores de la moto en la app",vtSub:"Botones, ruta y destacados usan el color elegido en el Garaje",nav:"Navegación",voice:"Avisos por voz",sunsetW:"Avisar antes del atardecer",dirt:"Evitar caminos de tierra",auto:"Fondo automático (día/noche)",units:"Unidades",yourName:"Tu nombre",gm:"Buenos días, {0}",ga:"Buenas tardes, {0}",ge:"Buenas noches, {0}",follow:"▶ Seguir viaje",stages:"Etapas",skip:"Saltar etapa",autonomy:"Autonomía",left:"{0} restantes",nextFuel:"Próxima gasolinera en {0} · {1}",ok:"margen ok",low:"autonomía baja",noFuel:"No hay gasolineras adelante hoy",nextStage:"Próxima etapa · {0}/{1}",arr:"Llegada {0}",dest:"Destino del día",sunset:"atardecer {0}",eta:"{0} · {1} hasta {2}",arrived:"Llegamos a {0}",dayDone:"Día terminado: llegamos a {0}",offline:"Offline",ready:"offline listo ✓",sunWarn:"Atardecer a las {0}. Faltan {1} hasta {2}.",then:"Después: {0}",overview:"Vista general",followBtn:"Seguir",mapNo:"Este navegador no pudo abrir el mapa 3D (WebGL no disponible).",
+ es:{tripsAvail:"Viajes en el dispositivo",inUse:"En uso",useTrip:"Usar este viaje",day1:"día",trips:"Viajes",route:"Itinerario",garage:"Garaje",settings:"Ajustes",days:"días",cont:"Continuar viaje · Día {0} de {1}",next:"{0} · próxima parada: {1} ({2})",openRoute:"Abrir itinerario",restart:"Reiniciar viaje",restartQ:"¿Volver el viaje al día 1?",cancel:"Cancelar",done:"Viaje terminado",aaTitle:"Android Auto",aaHint:"Conecta el móvil a la pantalla del coche y abre la app: muestra tu moto y el botón Seguir viaje, continuando desde la etapa guardada aquí.",day:"DÍA",times:"Salida {0} · llegada {1} · {2}",gap:"El tramo {0} → {1} ({2}) supera la autonomía útil de {3}. Agrega una gasolinera.",dep:"Salida {0}",fuel:"gasolinera",yours:"tu parada",night:"pernocta",arrival:"llegada",current:"actual",back:"◀ Volver",edit:"✎ Editar",adv:"Avanzar ▶",add:"+ Agregar parada",offMaps:"Ruta del viaje (OpenStreetMap)",offReady:"descargada",offOk:"✓ Itinerario, ruta, gasolineras y progreso guardados en el dispositivo",setCur:"Marcar como etapa actual",newStop:"Nueva parada",editStop:"Editar parada",name:"Nombre",time:"Hora (HH:MM)",km:"Km en el día",type:"Tipo",invalid:"Revisa el nombre, la hora (HH:MM) y el km.",save:"Guardar",del:"Eliminar",tFuel:"Gasolinera",tMeal:"Almuerzo + gasolinera",tOpt:"Gasolinera opcional",tNight:"Pernocta",tArr:"Llegada",tUser:"Parada",gSub:"Elige el vehículo del viaje",drag:"⟲ arrastra para girar 360°",v3d:"3D",vPhoto:"Foto",range:"Autonomía",margin:"Margen de seguridad",cons:"Consumo medio",usable:"Autonomía útil para sugerir gasolineras: {0}",sSub:"También se aplican en la pantalla del coche",lang:"Idioma",theme:"Fondo",dark:"Oscuro",light:"Claro",desert:"Desierto",coast:"Litoral",vt:"Colores de la moto en la app",vtSub:"Botones, ruta y destacados usan el color elegido en el Garaje",nav:"Navegación",voice:"Avisos por voz",sunsetW:"Avisar antes del atardecer",dirt:"Evitar caminos de tierra",auto:"Fondo automático (día/noche)",units:"Unidades",yourName:"Tu nombre",gm:"Buenos días, {0}",ga:"Buenas tardes, {0}",ge:"Buenas noches, {0}",follow:"▶ Seguir viaje",stages:"Etapas",skip:"Saltar etapa",autonomy:"Autonomía",left:"{0} restantes",nextFuel:"Próxima gasolinera en {0} · {1}",ok:"margen ok",low:"autonomía baja",noFuel:"No hay gasolineras adelante hoy",nextStage:"Próxima etapa · {0}/{1}",arr:"Llegada {0}",dest:"Destino del día",sunset:"atardecer {0}",eta:"{0} · {1} hasta {2}",arrived:"Llegamos a {0}",dayDone:"Día terminado: llegamos a {0}",offline:"Offline",ready:"offline listo ✓",sunWarn:"Atardecer a las {0}. Faltan {1} hasta {2}.",then:"Después: {0}",overview:"Vista general",followBtn:"Seguir",mapNo:"Este navegador no pudo abrir el mapa 3D (WebGL no disponible).",
    m:"Meteor 650",c:"Moto custom",tr:"Moto trail",h:"Hatchback",se:"Sedán",su:"SUV",mSub:"Royal Enfield · 648 cc bicilíndrica · cruiser",cSub:"Modelo genérico de custom",trSub:"Modelo genérico de trail",carSub:"Modelo genérico de coche",
    i_dep:"Sigue",i_turn:"Gira {0}",i_cont:"Continúa {0}",i_merge:"Incorpórate {0}",i_onramp:"Toma el acceso {0}",i_offramp:"Toma la salida {0}",i_fork:"En la bifurcación, mantente {0}",i_end:"Al final de la vía, gira {0}",i_round:"En la rotonda, toma la {0}ª salida",i_arrive:"Has llegado",i_uturn:"Haz un cambio de sentido",d_right:"a la derecha",d_left:"a la izquierda",d_sright:"ligeramente a la derecha",d_sleft:"ligeramente a la izquierda",d_shright:"bruscamente a la derecha",d_shleft:"bruscamente a la izquierda",d_straight:"recto",on:"{0} · {1}",to:"{0} · {1}"}
 };
@@ -27,10 +29,10 @@ const COLORS = [["#A3211F","Stellar Red"],["#E2611B","Fireball Orange"],["#E3A81
 const CITY = {"Stella Maris":[-12.9406,-38.3364],"Maceió":[-9.6658,-35.7353],"Natal":[-5.7945,-35.211],"Fortaleza":[-3.7319,-38.5267],"Pipa":[-6.229,-35.047],"Porto de Galinhas":[-8.503,-35.005],"Aracaju":[-10.9472,-37.0731]};
 const S = {
   trip: JSON.parse(JSON.stringify(TRIP)),
-  p: {d: 3, s: 0, done: false}, km: 0, rm: 0,
+  p: {d: 0, s: 0, done: false}, km: 0, rm: 0,
   g: {model: "METEOR", color: "#A3211F", range: TRIP.veiculo.autonomia_km, margin: TRIP.veiculo.margem_seguranca_pct, kmpl: TRIP.veiculo.consumo_km_l || 21.5},
   set: {lang: "pt", theme: "dark", vt: true, voice: true, sunset: true, dirt: true, auto: false, units: "km", name: "Gabriel"},
-  tab: "trips", shownDay: 3, carScreen: "welcome", driving: false, speed: 1, gview: "3d", modal: null, toast: null, prevNav: false
+  tab: "trips", shownDay: 0, carScreen: "welcome", driving: false, speed: 1, gview: "3d", modal: null, toast: null, prevNav: false
 };
 
 /* ---------------- cor da moto → tema ---------------- */
@@ -72,7 +74,7 @@ const nextFuel = () => (!day() || S.p.done) ? null : day().paradas.slice(S.p.s).
 function gaps(d){ const m=[0,...d.paradas.filter(isFuel).map(x=>x.km),d.km]; const u=[...new Set(m)].sort((a,b)=>a-b); const g=[]; for(let i=1;i<u.length;i++) if(u[i]-u[i-1]>usable()) g.push([u[i-1],u[i]]); return g; }
 
 /* km do roteiro ⇄ metros na rota real (por perna, entre paradas) */
-function routeOf(i){ return Nav.prep(ROUTES[i]); }
+function routeOf(i){ return Nav.prep(ROUTES[S.trip.id][i]); }
 function kmMap(i){
   const d = S.trip.dias[i], r = routeOf(i);
   if (r.legEnds.length === d.paradas.length) return [[0,0], ...d.paradas.map((p,j) => [p.km, r.legEnds[j]])];
@@ -115,7 +117,7 @@ const city = s => s.split(",")[0].trim();
 function posOf(st, d){ if (st.lat != null) return [st.lat, st.lng]; return CITY[city(st.nome)] || CITY[city(d.para)] || null; }
 function sunsetOf(d){ const l = [...d.paradas].reverse().map(x=>posOf(x,d)).find(Boolean); if (!l) return null; return toHM(sunsetMin(d.data, l[0], l[1])); }
 function clockAt(d, km){ const pts = [[0,toMin(d.saida)], ...d.paradas.map(x=>[x.km,toMin(x.hora)])]; for (let i=1;i<pts.length;i++){ if (km <= pts[i][0]) { const [k0,t0]=pts[i-1],[k1,t1]=pts[i]; return t0 + (t1-t0)*((km-k0)/Math.max(1,k1-k0)); } } return pts[pts.length-1][1]; }
-const dist = km => S.set.units === "km" ? Math.round(km).toLocaleString("pt-BR") + " km" : Math.round(km/1.609344).toLocaleString("pt-BR") + " mi";
+function dist(km){ const mi = S.set.units === "mi", v = mi ? km/1.609344 : km, u = mi ? " mi" : " km"; if (!mi && v < 1) return Math.round(km*100)*10 + " m"; return (v < 10 ? v.toFixed(1).replace(".", ",") : Math.round(v).toLocaleString("pt-BR")) + u; }
 function distShort(m){ if (S.set.units === "mi"){ const mi = m/1609.344; return mi < 0.2 ? Math.round(m*3.28084/50)*50 + " ft" : mi.toFixed(mi < 10 ? 1 : 0) + " mi"; } if (m < 1000) return (m < 100 ? Math.max(10, Math.round(m/10)*10) : Math.round(m/50)*50) + " m"; const k = m/1000; return (k < 10 ? k.toFixed(1).replace(".", ",") : Math.round(k)) + " km"; }
 const cons = v => S.set.units === "km" ? v.toFixed(1).replace(".", ",") + " km/l" : (v*2.352).toFixed(1).replace(".", ",") + " mpg";
 const emoji = st => ({FUEL:"⛽",OPT:"⛽",MEAL:"🍽",NIGHT:"🛏",ARR:"🏁",USER:"📍"}[kindOf(st.tipo)]);
@@ -177,16 +179,17 @@ function phoneHTML(){
   if (S.tab === "trips"){
     const tg = target();
     body = `<p class="h1">${t("trips")}</p><img class="veh" src="${vehImg("hero", 760, 475)}" alt="${esc(t(modelInfo()[1]))}">
-    <div class="card"><div class="trip-name">${esc(tr.nome)}</div><div class="muted" style="font-size:14px">${tr.dias.length} ${t("days")} · ${dist(totalKm)} · ${esc(t(modelInfo()[1]))}</div>
+    <div class="card"><div class="trip-name">${esc(tr.nome)}</div><div class="muted" style="font-size:14px">${tr.dias.length} ${t(tr.dias.length===1?"day1":"days")} · ${dist(totalKm)} · ${esc(t(modelInfo()[1]))}</div>
     <div style="height:12px"></div>
     ${S.p.done ? `<b style="color:var(--done)">${t("done")}</b>` : `<div class="eyebrow">${t("cont", S.p.d+1, tr.dias.length)}</div><div class="big">${esc(city(d.de))} → ${esc(city(d.para))}</div>
       ${tg ? `<div class="muted" style="font-size:14px">${esc(t("next", dist(d.km), tg.nome, dist(Math.max(0, tg.km - curKm()))))}</div>` : ""}`}
     <div class="row-btns"><button class="btn pri" data-act="tab" data-v="route">${t("openRoute")}</button><button class="btn ghost" data-act="askRestart">${t("restart")}</button></div></div>
+    <p class="sec">${t("tripsAvail")}</p>${TRIPS.map(x => { const act = x.id === tr.id; const km = x.dias.reduce((a,d)=>a+d.km,0); return `<div class="card" style="margin-bottom:8px;display:flex;align-items:center;gap:10px"><div style="flex:1;min-width:0"><b>${esc(x.nome)}</b><div class="muted" style="font-size:13px">${x.dias.length} ${t(x.dias.length===1?"day1":"days")} · ${dist(km)}</div></div>${act ? `<b style="color:var(--accent)">${t("inUse")}</b>` : `<button class="btn ghost" style="flex:none;padding:9px 12px" data-act="trip" data-v="${x.id}">${t("useTrip")}</button>`}</div>`; }).join("")}
     <p class="sec">${t("aaTitle")}</p><div class="card muted" style="font-size:13.5px;line-height:1.5">${t("aaHint")}</div>`;
   }
   if (S.tab === "route"){
     const i = S.shownDay, sd = tr.dias[i];
-    body = `<p class="h1">${t("route")}</p><p class="sub">${esc(tr.nome)} · ${tr.dias.length} ${t("days")} · ${dist(totalKm)}</p>
+    body = `<p class="h1">${t("route")}</p><p class="sub">${esc(tr.nome)} · ${tr.dias.length} ${t(tr.dias.length===1?"day1":"days")} · ${dist(totalKm)}</p>
     <div class="dayhdr"><button data-act="day" data-v="-1" ${i===0?"disabled":""} aria-label="Dia anterior">◀</button><b>${t("day")} ${i+1} · ${dayLabel(sd)} · ${esc(city(sd.de))} → ${esc(city(sd.para))}</b><button data-act="day" data-v="1" ${i===tr.dias.length-1?"disabled":""} aria-label="Próximo dia">▶</button></div>
     <p class="times">${t("times", sd.saida, sd.chegada, dist(sd.km))}</p>
     ${gaps(sd).map(([a,b])=>`<div class="warn">⚠ ${t("gap", dist(a), dist(b), dist(b-a), dist(usable()))}</div>`).join("")}
@@ -259,7 +262,30 @@ function renderPhone(){
 
 /* ---------------- Android Auto ---------------- */
 const carui = document.getElementById("carui");
-const mapOK = Nav.init(document.getElementById("mapwrap"));
+let mapOK = false;
+/* Mapa offline: mapa.json (tiles do OpenStreetMap de Salvador, fontes e ícones) servido por um protocolo próprio. */
+async function loadMapPack(){
+  try {
+    const res = await fetch("mapa.json"); if (!res.ok) throw new Error("mapa.json " + res.status);
+    const pack = await res.json();
+    const bin = atob(pack.data), buf = new Uint8Array(bin.length).buffer, u8 = new Uint8Array(buf);
+    for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    const idx = pack.index, base = 0;
+    const get = async path => {
+      const e = idx[path]; if (!e) return null;
+      const bytes = buf.slice(base + e[0], base + e[0] + e[1]);
+      return e[2] ? await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer() : bytes;
+    };
+    maplibregl.addProtocol("pack", async params => {
+      const path = decodeURIComponent(params.url.replace("pack://", ""));
+      const data = await get(path);
+      if (!data){ if (path.startsWith("tiles/")) return { data: new ArrayBuffer(0) }; throw new Error("sem " + path); }
+      if (params.type === "json") return { data: JSON.parse(new TextDecoder().decode(data)) };
+      return { data };
+    });
+    return JSON.parse(document.getElementById("mapstyle").textContent);
+  } catch (e) { console.warn("mapa offline indisponível:", e); return null; }
+}
 let navBuilt = false;
 function dayChanged(){ setNavRoute(); }
 function stopMarkers(){
@@ -352,7 +378,7 @@ function speak(msg){ try { if (S.set.voice && window.speechSynthesis && voiceUnl
 
 /* ---------------- simulação da estrada ---------------- */
 // 1× ≈ 220 m/s de simulação (a viagem do dia passa em ~45 min); 5× e 20× para avançar rápido.
-const MPS = 220;
+const MPS = 15; // 1× ≈ 54 km/h (velocidade real de bairro); 5×, 20× e 100× para avançar rápido
 let raf = 0, lastT = 0, lastUi = 0;
 function frameLoop(now){
   if (!S.driving){ raf = 0; return; }
@@ -400,6 +426,7 @@ document.addEventListener("click", e => {
     case "addStop": S.modal = {type:"edit", day:S.shownDay, j:null}; renderPhone(); return;
     case "kind": { const f = readForm(); S.modal = {...S.modal, tipo:v}; renderPhone(); fillForm(f); return; }
     case "delStop": { const ps = S.trip.dias[S.modal.day].paradas; if (ps.length > 1){ ps.splice(S.modal.j,1); if (S.p.d===S.modal.day) S.p.s = Math.min(S.p.s, ps.length-1); syncRm(); } S.modal = null; break; }
+    case "trip": { stopDrive(); const x = TRIPS.find(z => z.id === v); if (x){ S.trip = JSON.parse(JSON.stringify(x)); S.p = {d:0, s:0, done:false}; S.shownDay = 0; S.carScreen = "welcome"; sunsetWarned = -1; syncRm(); setNavRoute(); } break; }
     case "model": S.g.model = v; break;
     case "color": S.g.color = v; break;
     case "gview": S.gview = v; renderPhone(); return;
@@ -418,7 +445,7 @@ document.addEventListener("click", e => {
     case "follow": Nav.setFollow(!Nav.follow, S.rm); updateNav(); return;
     case "tilt": Nav.setTilt(!Nav.tilt); updateNav(); return;
     case "drive": S.driving ? stopDrive() : startDrive(); return;
-    case "speed": S.speed = S.speed === 1 ? 5 : S.speed === 5 ? 20 : 1; el.textContent = `Velocidade ${S.speed}×`; return;
+    case "speed": S.speed = S.speed === 1 ? 5 : S.speed === 5 ? 20 : S.speed === 20 ? 100 : 1; el.textContent = `Velocidade ${S.speed}×`; return;
   }
   renderAll();
 });
@@ -441,5 +468,8 @@ document.addEventListener("input", e => { if (e.target.id === "name-input" && e.
 
 /* ---------------- início ---------------- */
 syncRm();
-setNavRoute();
 renderAll();
+loadMapPack().then(style => {
+  mapOK = Nav.init(document.getElementById("mapwrap"), style);
+  setNavRoute(); refreshSprites(); applyAccent(); renderCar();
+});
